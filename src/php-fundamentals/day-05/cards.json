@@ -1,0 +1,17 @@
+[
+    {
+        "number": "1234567890",
+        "amount": 250,
+        "status": "active"
+    },
+    {
+        "number": "0987654321",
+        "amount": 500,
+        "status": "unused"
+    },
+    {
+        "number": "1122334455",
+        "amount": 1000,
+        "status": "expired"
+    }
+]

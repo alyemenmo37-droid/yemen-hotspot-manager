@@ -1,0 +1,51 @@
+[
+    {
+        "number": "1234567890",
+        "amount": 250,
+        "speed": "256k\/1M",
+        "status": "active",
+        "created": "2026-10-10 19:00:37"
+    },
+    {
+        "number": "0987654321",
+        "amount": 500,
+        "speed": "512k\/2M",
+        "status": "expired",
+        "created": "2026-10-10 19:00:37"
+    },
+    {
+        "number": "0079074182",
+        "amount": 250,
+        "speed": "256k\/1M",
+        "status": "unused",
+        "created": "2026-10-10 19:00:37"
+    },
+    {
+        "number": "0358312689",
+        "amount": 250,
+        "speed": "256k\/1M",
+        "status": "unused",
+        "created": "2026-10-10 19:00:37"
+    },
+    {
+        "number": "3885704354",
+        "amount": 250,
+        "speed": "256k\/1M",
+        "status": "unused",
+        "created": "2026-10-10 19:00:37"
+    },
+    {
+        "number": "8119956787",
+        "amount": 250,
+        "speed": "256k\/1M",
+        "status": "unused",
+        "created": "2026-10-10 19:00:37"
+    },
+    {
+        "number": "2102628138",
+        "amount": 250,
+        "speed": "256k\/1M",
+        "status": "unused",
+        "created": "2026-10-10 19:00:37"
+    }
+]
