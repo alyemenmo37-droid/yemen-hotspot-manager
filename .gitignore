@@ -42,3 +42,11 @@ Thumbs.db
 # Personal
 /notes-private/
 /test-data/
+# YHM Data (local testing)
+yhm-cards.json
+yhm-log.txt
+!package.json
+!composer.json
+# YHM Data
+src/php-fundamentals/day-05/yhm-cards.json
+src/php-fundamentals/day-05/yhm-log.txt
