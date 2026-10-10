@@ -1,0 +1,44 @@
+# ═══════════════════════════════════════
+# YHM - Git Ignore
+# ═══════════════════════════════════════
+
+# Dependencies
+/vendor/
+/node_modules/
+
+# Environment
+.env
+.env.backup
+.env.local
+
+# Logs
+*.log
+/storage/logs/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Temp files
+/tmp/
+*.tmp
+*.bak
+*~
+
+# Database
+*.sqlite
+*.sql
+
+# Cache
+/bootstrap/cache/
+.phpunit.result.cache
+
+# Personal
+/notes-private/
+/test-data/

@@ -1,0 +1,20 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Specific file types
+*.php text
+*.md text
+*.txt text
+*.json text
+*.js text
+*.css text
+*.html text
+
+# Binary files
+*.png binary
+*.jpg binary
+*.pdf binary
+*.zip binary
+
+# Diff settings
+*.php diff=php
