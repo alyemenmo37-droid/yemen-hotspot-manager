@@ -50,3 +50,9 @@ yhm-log.txt
 # YHM Data
 src/php-fundamentals/day-05/yhm-cards.json
 src/php-fundamentals/day-05/yhm-log.txt
+# YHM Local Data (test files)
+src/php-fundamentals/day-05/cards.json
+src/php-fundamentals/day-05/yhm-cards.json
+src/php-fundamentals/day-05/yhm-log.txt
+src/php-fundamentals/day-05/*.json
+src/php-fundamentals/day-05/*.txt

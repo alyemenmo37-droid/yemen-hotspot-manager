@@ -14,6 +14,7 @@ $cards = [
 // 1. array_column - استخراج عمود
 // ═══════════════════════════════════════
 $numbers = array_column($cards, 'number');
+print_r($numbers);
 echo "الأرقام: " . implode(', ', $numbers) . "\n";
 
 $amounts = array_column($cards, 'amount');
