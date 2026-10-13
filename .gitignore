@@ -56,3 +56,13 @@ src/php-fundamentals/day-05/yhm-cards.json
 src/php-fundamentals/day-05/yhm-log.txt
 src/php-fundamentals/day-05/*.json
 src/php-fundamentals/day-05/*.txt
+# ═══════════════════════════════════════
+# YHM - Local Test Data
+# ═══════════════════════════════════════
+src/php-fundamentals/**/data/
+src/php-fundamentals/**/*.json
+src/php-fundamentals/**/*.log
+src/php-fundamentals/**/*.txt
+
+# Keep example files
+!src/php-fundamentals/**/example.json
