@@ -68,3 +68,6 @@ src/php-fundamentals/**/*.txt
 !src/php-fundamentals/**/example.json
 # YHM v0.1 - Local data
 src/php-fundamentals/day-07/data/
+
+# YHM MySQL Local
+src/php-fundamentals/day-10/data/
