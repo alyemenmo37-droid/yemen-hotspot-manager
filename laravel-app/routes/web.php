@@ -79,7 +79,9 @@ Route::get('/yhm', function () {
 // 3. Routes البطاقات (Resource)
 // ═══════════════════════════════════════
 Route::resource('cards', CardController::class);
-
+// مسار تفعيل البطاقة
+Route::post('/cards/{card}/activate', [CardController::class, 'activate'])
+    ->name('cards.activate');
 /*
  * هذا الأمر يُنشئ تلقائياً 7 routes:
  * 
@@ -138,3 +140,15 @@ Route::get('/about', function () {
         'locale' => config('app.locale'),
     ];
 })->name('about');
+
+// صفحة dashboard
+Route::get('/dashboard', function () {
+    $stats = [
+        'total' => \App\Models\Card::count(),
+        'active' => \App\Models\Card::where('status', 'active')->count(),
+        'unused' => \App\Models\Card::where('status', 'unused')->count(),
+        'sales' => \App\Models\Card::where('status', '!=', 'unused')->sum('amount'),
+    ];
+    
+    return view('dashboard', compact('stats'));
+})->name('dashboard');
