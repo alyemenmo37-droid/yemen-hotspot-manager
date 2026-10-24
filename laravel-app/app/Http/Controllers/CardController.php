@@ -3,18 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Card;
+use App\Models\SpeedLevel;
 use Illuminate\Http\Request;
 
 class CardController extends Controller
 {
-    /**
-     * عرض كل البطاقات
-     */
     public function index()
     {
-        $cards = Card::orderByDesc('created_at')->paginate(15);
+        $cards = Card::with('speedLevel.category')
+            ->orderByDesc('created_at')
+            ->paginate(15);
         
-        // إحصائيات
         $stats = [
             'total' => Card::count(),
             'active' => Card::where('status', Card::STATUS_ACTIVE)->count(),
@@ -25,85 +24,85 @@ class CardController extends Controller
         return view('cards.index', compact('cards', 'stats'));
     }
     
-    /**
-     * نموذج إضافة بطاقة
-     */
     public function create()
     {
-        return view('cards.create');
+        $speedLevels = SpeedLevel::with('category')
+            ->where('is_active', true)
+            ->get()
+            ->groupBy('category.name');
+        
+        return view('cards.create', compact('speedLevels'));
     }
     
-    /**
-     * حفظ بطاقة جديدة
-     */
     public function store(Request $request)
     {
-        // التحقق
         $validated = $request->validate([
-            'number' => [
-                'required',
-                'digits:10',
-                'unique:cards,number',
-            ],
-            'amount' => ['required', 'integer', 'min:1', 'max:1000000'],
-            'speed' => ['required', 'in:512k/512k,256k/1M,512k/2M,2M/15M'],
+            'number' => ['required', 'digits:10', 'unique:cards,number'],
+            'speed_level_id' => ['required', 'exists:speed_levels,id'],
             'data_limit_mb' => ['nullable', 'integer', 'min:0'],
         ], [
             'number.required' => 'رقم البطاقة مطلوب',
             'number.digits' => 'رقم البطاقة يجب أن يكون 10 أرقام',
             'number.unique' => 'رقم البطاقة موجود مسبقاً',
-            'amount.required' => 'السعر مطلوب',
-            'amount.min' => 'السعر يجب أن يكون 1 على الأقل',
-            'speed.required' => 'السرعة مطلوبة',
-            'speed.in' => 'السرعة غير صالحة',
+            'speed_level_id.required' => 'السرعة مطلوبة',
+            'speed_level_id.exists' => 'السرعة غير موجودة',
         ]);
         
-        $validated['status'] = Card::STATUS_UNUSED;
+        // جلب speed level للحصول على السعر
+        $speedLevel = SpeedLevel::findOrFail($validated['speed_level_id']);
         
-        Card::create($validated);
+        // إنشاء البطاقة
+        Card::create([
+            'number' => $validated['number'],
+            'amount' => $speedLevel->price,
+            'speed' => $speedLevel->rate_limit,
+            'speed_level_id' => $speedLevel->id,
+            'status' => Card::STATUS_UNUSED,
+            'data_limit_mb' => $validated['data_limit_mb'] ?? $speedLevel->data_limit_mb,
+        ]);
         
         return redirect()
             ->route('cards.index')
-            ->with('success', "تم إضافة البطاقة {$validated['number']}");
+            ->with('success', "تم إضافة البطاقة {$validated['number']} (السعر: {$speedLevel->price} ريال)");
     }
     
-    /**
-     * عرض بطاقة واحدة
-     */
     public function show(Card $card)
     {
+        $card->load('speedLevel.category');
         return view('cards.show', compact('card'));
     }
     
-    /**
-     * نموذج تعديل
-     */
     public function edit(Card $card)
     {
-        return view('cards.edit', compact('card'));
+        $speedLevels = SpeedLevel::with('category')
+            ->where('is_active', true)
+            ->get()
+            ->groupBy('category.name');
+        
+        return view('cards.edit', compact('card', 'speedLevels'));
     }
     
-    /**
-     * حفظ التعديلات
-     */
     public function update(Request $request, Card $card)
     {
         $validated = $request->validate([
-            'amount' => ['required', 'integer', 'min:1'],
-            'speed' => ['required', 'in:512k/512k,256k/1M,512k/2M,2M/15M'],
+            'speed_level_id' => ['required', 'exists:speed_levels,id'],
             'status' => ['required', 'in:unused,active,expired,stopped'],
         ]);
         
-        $card->update($validated);
+        $speedLevel = SpeedLevel::findOrFail($validated['speed_level_id']);
+        
+        $card->update([
+            'speed_level_id' => $speedLevel->id,
+            'speed' => $speedLevel->rate_limit,
+            'amount' => $speedLevel->price,
+            'status' => $validated['status'],
+        ]);
         
         return redirect()
             ->route('cards.index')
             ->with('success', "تم تعديل البطاقة {$card->number}");
     }
     
-    /**
-     * حذف
-     */
     public function destroy(Card $card)
     {
         $number = $card->number;
@@ -114,9 +113,6 @@ class CardController extends Controller
             ->with('success', "تم حذف البطاقة $number");
     }
     
-    /**
-     * تفعيل بطاقة (إجراء إضافي)
-     */
     public function activate(Card $card)
     {
         $card->activate();

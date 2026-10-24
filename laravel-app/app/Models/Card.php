@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -157,4 +158,11 @@ class Card extends Model
     {
         return $query->where('number', 'like', "%$number%");
     }
+}
+/**
+ * العلاقة: بطاقة → مستوى سرعة (belongsTo)
+ */
+public function speedLevel(): BelongsTo
+{
+    return $this->belongsTo(SpeedLevel::class);
 }

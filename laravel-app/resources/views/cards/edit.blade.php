@@ -22,7 +22,7 @@
                     <small style="color: #999;">لا يمكن تعديل رقم البطاقة</small>
                 </div>
                 
-                <div style="margin-bottom: 20px;">
+               /* <div style="margin-bottom: 20px;">
                     <label style="display: block; margin-bottom: 8px; font-weight: bold;">
                         السعر:
                     </label>
@@ -42,8 +42,35 @@
                             </option>
                         @endforeach
                     </select>
-                </div>
+                </div>*/
                 
+<div style="margin-bottom: 20px;">
+    <label style="display: block; margin-bottom: 8px; font-weight: bold;">
+        نوع البطاقة:
+    </label>
+    <select name="speed_level_id" required
+            style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; box-sizing: border-box;">
+        @foreach($speedLevels as $categoryName => $levels)
+            <optgroup label="📁 {{ $categoryName }}">
+                @foreach($levels as $level)
+                    <option value="{{ $level->id }}" 
+                        {{ old('speed_level_id', $card->speed_level_id) == $level->id ? 'selected' : '' }}>
+                        {{ $level->name }} — {{ $level->rate_limit }} — {{ $level->price }} ريال
+                    </option>
+                @endforeach
+            </optgroup>
+        @endforeach
+    </select>
+</div>
+
+<div style="margin-bottom: 20px;">
+    <label style="display: block; margin-bottom: 8px; font-weight: bold;">
+        السعر (الحالي):
+    </label>
+    <div style="padding: 12px; background: #f5f5f5; border-radius: 8px; color: #666;">
+        {{ $card->amount }} ريال (سيتحدث تلقائياً)
+    </div>
+</div>
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; margin-bottom: 8px; font-weight: bold;">
                         الحالة:

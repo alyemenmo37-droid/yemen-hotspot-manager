@@ -28,7 +28,7 @@
                     @enderror
                 </div>
                 
-                <div style="margin-bottom: 20px;">
+              /*  <div style="margin-bottom: 20px;">
                     <label style="display: block; margin-bottom: 8px; font-weight: bold;">
                         السعر (ريال):
                     </label>
@@ -59,7 +59,39 @@
                             2M/15M — مفتوح
                         </option>
                     </select>
-                </div>
+                </div> */
+<div style="margin-bottom: 20px;">
+    <label style="display: block; margin-bottom: 8px; font-weight: bold;">
+        السعر:
+    </label>
+    <div style="padding: 12px; background: #f5f5f5; border-radius: 8px; color: #666;">
+        💡 يُحدد تلقائياً حسب نوع البطاقة المختارة
+    </div>
+</div>
+<div style="margin-bottom: 20px;">
+    <label style="display: block; margin-bottom: 8px; font-weight: bold;">
+        نوع البطاقة (السرعة + المدة):
+    </label>
+    <select name="speed_level_id" 
+            required
+            style="width: 100%; padding: 12px; border: 2px solid {{ $errors->has('speed_level_id') ? '#c62828' : '#eee' }}; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+        <option value="">-- اختر نوع البطاقة --</option>
+        @foreach($speedLevels as $categoryName => $levels)
+            <optgroup label="📁 {{ $categoryName }}">
+                @foreach($levels as $level)
+                    <option value="{{ $level->id }}" {{ old('speed_level_id') == $level->id ? 'selected' : '' }}>
+                        {{ $level->name }} — {{ $level->rate_limit }} — {{ $level->price }} ريال — {{ $level->durationFormatted() }}
+                    </option>
+                @endforeach
+            </optgroup>
+        @endforeach
+    </select>
+    @error('speed_level_id')
+        <div style="color: #c62828; font-size: 13px; margin-top: 5px;">
+            ❌ {{ $message }}
+        </div>
+    @enderror
+</div>
                 
                 <div style="display: flex; gap: 10px;">
                     <x-button type="submit" style="flex: 1;">
