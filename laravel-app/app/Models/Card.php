@@ -158,11 +158,12 @@ class Card extends Model
     {
         return $query->where('number', 'like', "%$number%");
     }
+    /**
+     * العلاقة: بطاقة → مستوى سرعة (belongsTo)
+     */
+    public function speedLevel(): BelongsTo
+    {
+        return $this->belongsTo(SpeedLevel::class);
+    }
 }
-/**
- * العلاقة: بطاقة → مستوى سرعة (belongsTo)
- */
-public function speedLevel(): BelongsTo
-{
-    return $this->belongsTo(SpeedLevel::class);
-}
+

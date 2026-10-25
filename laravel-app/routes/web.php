@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\DashboardController;
@@ -13,10 +14,19 @@ use App\Http\Controllers\DashboardController;
 // ═══════════════════════════════════════
 // 1. الصفحة الرئيسية
 // ═══════════════════════════════════════
+//Route::get('/', function () {
+//    return view('welcome');
+//})->name('home');
+// ═══════════════════════════════════════
+// Public Routes
+// ═══════════════════════════════════════
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard');
 })->name('home');
 
+Route::get('/yhm', function () {
+    return view('welcome');
+})->name('yhm');
 
 // ═══════════════════════════════════════
 // 2. صفحة YHM الترحيبية
@@ -74,11 +84,55 @@ Route::get('/yhm', function () {
     ';
 })->name('yhm');
 
+// ═══════════════════════════════════════
+// Auth Routes (بدون حماية)
+// ═══════════════════════════════════════
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+});
+
+Route::post('/logout', [LoginController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
+
+// ═══════════════════════════════════════
+// Routes محمية (تحتاج تسجيل دخول)
+// ═══════════════════════════════════════
+
+Route::middleware('auth')->group(function () {
+    
+    // dashboard
+    Route::get('/dashboard', function () {
+        $stats = [
+            'total' => \App\Models\Card::count(),
+            'active' => \App\Models\Card::where('status', 'active')->count(),
+            'unused' => \App\Models\Card::where('status', 'unused')->count(),
+            'sales' => \App\Models\Card::where('status', '!=', 'unused')->sum('amount'),
+        ];
+        return view('dashboard', compact('stats'));
+    })->name('dashboard');
+    
+    // Cards (resource)
+    Route::resource('cards', CardController::class);
+    
+    // تفعيل بطاقة
+    Route::post('/cards/{card}/activate', [CardController::class, 'activate'])
+        ->name('cards.activate');
+    
+    // admin
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', function () {
+            return '<h1>لوحة الإدارة</h1><p>قريباً...</p>';
+        })->name('dashboard');
+    });
+});
+
 
 // ═══════════════════════════════════════
 // 3. Routes البطاقات (Resource)
 // ═══════════════════════════════════════
-Route::resource('cards', CardController::class);
+//Route::resource('cards', CardController::class);
 // مسار تفعيل البطاقة
 Route::post('/cards/{card}/activate', [CardController::class, 'activate'])
     ->name('cards.activate');

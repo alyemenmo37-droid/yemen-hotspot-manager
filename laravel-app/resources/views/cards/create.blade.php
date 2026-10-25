@@ -10,6 +10,7 @@
             <form method="POST" action="{{ route('cards.store') }}">
                 @csrf
                 
+                {{-- رقم البطاقة --}}
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; margin-bottom: 8px; font-weight: bold;">
                         رقم البطاقة:
@@ -17,6 +18,7 @@
                     <input type="text" 
                            name="number" 
                            pattern="\d{10}" 
+                           maxlength="10"
                            placeholder="10 أرقام"
                            value="{{ old('number') }}"
                            required
@@ -28,71 +30,39 @@
                     @enderror
                 </div>
                 
-              /*  <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                        السعر (ريال):
-                    </label>
-                    <input type="number" 
-                           name="amount" 
-                           value="{{ old('amount', 250) }}"
-                           required
-                           style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
-                </div>
-                
+                {{-- نوع البطاقة (السرعة + المدة + السعر) --}}
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                        السرعة:
+                        نوع البطاقة:
                     </label>
-                    <select name="speed" 
+                    <select name="speed_level_id" 
                             required
-                            style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
-                        <option value="512k/512k" {{ old('speed') === '512k/512k' ? 'selected' : '' }}>
-                            512k/512k — بطيء
-                        </option>
-                        <option value="256k/1M" {{ old('speed', '256k/1M') === '256k/1M' ? 'selected' : '' }}>
-                            256k/1M — متوسط
-                        </option>
-                        <option value="512k/2M" {{ old('speed') === '512k/2M' ? 'selected' : '' }}>
-                            512k/2M — عالي
-                        </option>
-                        <option value="2M/15M" {{ old('speed') === '2M/15M' ? 'selected' : '' }}>
-                            2M/15M — مفتوح
-                        </option>
+                            style="width: 100%; padding: 12px; border: 2px solid {{ $errors->has('speed_level_id') ? '#c62828' : '#eee' }}; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                        <option value="">-- اختر نوع البطاقة --</option>
+                        @foreach($speedLevels as $categoryName => $levels)
+                            <optgroup label="📁 {{ $categoryName }}">
+                                @foreach($levels as $level)
+                                    <option value="{{ $level->id }}" 
+                                        {{ old('speed_level_id') == $level->id ? 'selected' : '' }}>
+                                        {{ $level->name }} — {{ $level->rate_limit }} — {{ $level->price }} ريال — {{ $level->durationFormatted() }}
+                                    </option>
+                                @endforeach
+                            </optgroup>
+                        @endforeach
                     </select>
-                </div> */
-<div style="margin-bottom: 20px;">
-    <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-        السعر:
-    </label>
-    <div style="padding: 12px; background: #f5f5f5; border-radius: 8px; color: #666;">
-        💡 يُحدد تلقائياً حسب نوع البطاقة المختارة
-    </div>
-</div>
-<div style="margin-bottom: 20px;">
-    <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-        نوع البطاقة (السرعة + المدة):
-    </label>
-    <select name="speed_level_id" 
-            required
-            style="width: 100%; padding: 12px; border: 2px solid {{ $errors->has('speed_level_id') ? '#c62828' : '#eee' }}; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
-        <option value="">-- اختر نوع البطاقة --</option>
-        @foreach($speedLevels as $categoryName => $levels)
-            <optgroup label="📁 {{ $categoryName }}">
-                @foreach($levels as $level)
-                    <option value="{{ $level->id }}" {{ old('speed_level_id') == $level->id ? 'selected' : '' }}>
-                        {{ $level->name }} — {{ $level->rate_limit }} — {{ $level->price }} ريال — {{ $level->durationFormatted() }}
-                    </option>
-                @endforeach
-            </optgroup>
-        @endforeach
-    </select>
-    @error('speed_level_id')
-        <div style="color: #c62828; font-size: 13px; margin-top: 5px;">
-            ❌ {{ $message }}
-        </div>
-    @enderror
-</div>
+                    @error('speed_level_id')
+                        <div style="color: #c62828; font-size: 13px; margin-top: 5px;">
+                            ❌ {{ $message }}
+                        </div>
+                    @enderror
+                </div>
                 
+                {{-- ملاحظة --}}
+                <div style="margin-bottom: 20px; padding: 12px; background: #e8f5e9; border-radius: 8px; color: #2e7d32; font-size: 13px;">
+                    💡 <strong>السعر والسرعة يُحدَّدان تلقائياً</strong> بناءً على النوع المختار
+                </div>
+                
+                {{-- الأزرار --}}
                 <div style="display: flex; gap: 10px;">
                     <x-button type="submit" style="flex: 1;">
                         💾 حفظ البطاقة
