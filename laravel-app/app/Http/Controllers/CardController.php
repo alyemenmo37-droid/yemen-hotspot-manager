@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\MikroTikService;
 use App\Models\Card;
 use App\Models\SpeedLevel;
 use Illuminate\Http\Request;
@@ -38,37 +39,50 @@ class CardController extends Controller
         return view('cards.create', compact('speedLevels'));
     }
     
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'number' => ['required', 'digits:10', 'unique:cards,number'],
-            'speed_level_id' => ['required', 'exists:speed_levels,id'],
-            'data_limit_mb' => ['nullable', 'integer', 'min:0'],
-        ], [
-            'number.required' => 'رقم البطاقة مطلوب',
-            'number.digits' => 'رقم البطاقة يجب أن يكون 10 أرقام',
-            'number.unique' => 'رقم البطاقة موجود مسبقاً',
-            'speed_level_id.required' => 'السرعة مطلوبة',
-            'speed_level_id.exists' => 'السرعة غير موجودة',
-        ]);
-        
-        // جلب speed level للحصول على السعر
-        $speedLevel = SpeedLevel::findOrFail($validated['speed_level_id']);
-        
-        // إنشاء البطاقة
-        Card::create([
-            'number' => $validated['number'],
-            'amount' => $speedLevel->price,
-            'speed' => $speedLevel->rate_limit,
-            'speed_level_id' => $speedLevel->id,
-            'status' => Card::STATUS_UNUSED,
-            'data_limit_mb' => $validated['data_limit_mb'] ?? $speedLevel->data_limit_mb,
-        ]);
-        
-        return redirect()
-            ->route('cards.index')
-            ->with('success', "تم إضافة البطاقة {$validated['number']} (السعر: {$speedLevel->price} ريال)");
+
+public function store(Request $request, MikroTikService $mikrotik)
+{
+    $validated = $request->validate([
+        'number' => ['required', 'digits:10', 'unique:cards,number'],
+        'speed_level_id' => ['required', 'exists:speed_levels,id'],
+        'data_limit_mb' => ['nullable', 'integer', 'min:0'],
+    ], [
+        'number.required' => 'رقم البطاقة مطلوب',
+        'number.digits' => 'رقم البطاقة يجب أن يكون 10 أرقام',
+        'number.unique' => 'رقم البطاقة موجود مسبقاً',
+        'speed_level_id.required' => 'السرعة مطلوبة',
+    ]);
+    
+    $speedLevel = SpeedLevel::findOrFail($validated['speed_level_id']);
+    
+    // 1. إضافة إلى MikroTik
+    $duration = '1d'; // يمكن حسابها من speedLevel
+    $mikrotikResult = $mikrotik->addUser(
+        $validated['number'],
+        $speedLevel->rate_limit,
+        $duration
+    );
+    
+    if (!$mikrotikResult['success']) {
+        return back()
+            ->withInput()
+            ->with('error', 'فشل MikroTik: ' . $mikrotikResult['message']);
     }
+    
+    // 2. حفظ في قاعدة البيانات
+    Card::create([
+        'number' => $validated['number'],
+        'amount' => $speedLevel->price,
+        'speed' => $speedLevel->rate_limit,
+        'speed_level_id' => $speedLevel->id,
+        'status' => Card::STATUS_UNUSED,
+        'data_limit_mb' => $validated['data_limit_mb'] ?? $speedLevel->data_limit_mb,
+    ]);
+    
+    return redirect()
+        ->route('cards.index')
+        ->with('success', "تم إضافة البطاقة {$validated['number']} (MikroTik: {$mikrotikResult['mode']})");
+}
     
     public function show(Card $card)
     {
@@ -107,15 +121,20 @@ class CardController extends Controller
             ->with('success', "تم تعديل البطاقة {$card->number}");
     }
     
-    public function destroy(Card $card)
-    {
-        $number = $card->number;
-        $card->delete();
-        
-        return redirect()
-            ->route('cards.index')
-            ->with('success', "تم حذف البطاقة $number");
-    }
+public function destroy(Card $card, MikroTikService $mikrotik)
+{
+    $number = $card->number;
+    
+    // 1. حذف من MikroTik
+    $mikrotik->removeUser($number);
+    
+    // 2. حذف من DB
+    $card->delete();
+    
+    return redirect()
+        ->route('cards.index')
+        ->with('success', "تم حذف البطاقة $number");
+}
     
     public function activate(Card $card)
     {

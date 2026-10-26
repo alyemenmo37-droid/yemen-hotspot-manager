@@ -20,6 +20,11 @@
 		    📊 الإحصائيات
 		</a>
 
+		<a href="{{ route('mikrotik.index') }}" 
+		   class="{{ request()->routeIs('mikrotik.*') ? 'active' : '' }}">
+		    🌐 MikroTik
+		</a>
+
 		@if(auth()->user()->isAdmin())
 		    <a href="{{ route('admin.dashboard') }}" 
 		       class="{{ request()->routeIs('admin.*') ? 'active' : '' }}">

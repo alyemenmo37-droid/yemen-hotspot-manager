@@ -81,6 +81,24 @@ Route::middleware('auth')->group(function () {
     Route::get('/statistics', [\App\Http\Controllers\StatisticsController::class, 'index'])
         ->name('statistics');
     
+    // MikroTik
+    Route::prefix('mikrotik')->name('mikrotik.')->group(function () {
+        Route::get('/', function (\App\Services\MikroTikService $mikrotik) {
+            $info = $mikrotik->getSystemInfo();
+            $sessions = $mikrotik->getActiveSessions();
+            return view('mikrotik.index', compact('info', 'sessions'));
+        })->name('index');
+        
+        Route::post('/test', function (\App\Services\MikroTikService $mikrotik) {
+            return response()->json($mikrotik->testConnection());
+        })->name('test');
+        
+        Route::post('/disconnect/{card}', function ($card, \App\Services\MikroTikService $mikrotik) {
+            $result = $mikrotik->disconnectUser($card);
+            return back()->with($result['success'] ? 'success' : 'error', $result['message']);
+        })->name('disconnect');
+    });
+
     // ═══════════════════════════════════════
     // Admin Routes (admin only)
     // ═══════════════════════════════════════
