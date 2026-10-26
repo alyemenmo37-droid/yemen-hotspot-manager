@@ -26,6 +26,10 @@ class CardController extends Controller
     
     public function create()
     {
+        if (!auth()->user()->isAdmin() && auth()->user()->role !== 'manager') {
+            abort(403, 'غير مصرح بإضافة بطاقات');
+        }
+        
         $speedLevels = SpeedLevel::with('category')
             ->where('is_active', true)
             ->get()
