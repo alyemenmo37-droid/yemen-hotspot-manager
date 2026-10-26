@@ -14,6 +14,12 @@
                    class="{{ request()->routeIs('cards.*') ? 'active' : '' }}">
                     🎫 البطاقات
                 </a>
+
+		<a href="{{ route('statistics') }}" 
+		   class="{{ request()->routeIs('statistics') ? 'active' : '' }}">
+		    📊 الإحصائيات
+		</a>
+
 		@if(auth()->user()->isAdmin())
 		    <a href="{{ route('admin.dashboard') }}" 
 		       class="{{ request()->routeIs('admin.*') ? 'active' : '' }}">

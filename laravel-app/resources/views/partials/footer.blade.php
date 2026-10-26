@@ -1,10 +1,18 @@
-<footer>
-    <p>
-        <strong>YHM v0.3</strong> 
-        &copy; {{ date('Y') }} 
-        — صُنع بحب في اليمن 🇾🇪
-    </p>
-    <p style="margin-top: 5px; opacity: 0.7; font-size: 12px;">
-        Laravel {{ app()->version() }} | PHP {{ PHP_VERSION }}
-    </p>
+<footer style="background: #333; color: white; padding: 30px 20px; margin-top: 40px;">
+    <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 10px;">📡 Yemen Hotspot Manager</div>
+        <div style="opacity: 0.8; margin-bottom: 15px;">v0.4 — Laravel Edition</div>
+        
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; font-size: 13px; opacity: 0.7; margin-bottom: 15px;">
+            <span>Laravel {{ app()->version() }}</span>
+            <span>•</span>
+            <span>PHP {{ PHP_VERSION }}</span>
+            <span>•</span>
+            <span>{{ now()->format('Y') }}</span>
+        </div>
+        
+        <div style="font-size: 13px; opacity: 0.6;">
+            صُنع بحب في اليمن 🇾🇪
+        </div>
+    </div>
 </footer>

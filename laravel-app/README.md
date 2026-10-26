@@ -56,3 +56,31 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 📡 Yemen Hotspot Manager (YHM)
+
+نظام احترافي لإدارة شبكات الواي فاي المدفوعة (Hotspot).
+
+## 🌟 الميزات
+
+- ✅ إدارة البطاقات (CRUD)
+- ✅ إدارة المستخدمين (3 أدوار)
+- ✅ إحصائيات متقدمة
+- ✅ تصميم RTL عربي
+- ✅ متجاوب (Mobile)
+- ✅ آمن (CSRF, Auth, Roles)
+- ✅ Laravel 13
+- ✅ PHP 8.5
+- ✅ MySQL
+
+## 🚀 التثبيت
+
+```bash
+git clone [repo]
+cd laravel-app
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan db:seed --class=CategorySpeedSeeder
+php artisan db:seed --class=UserSeeder
+php artisan serve

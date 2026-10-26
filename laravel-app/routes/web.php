@@ -76,6 +76,10 @@ Route::middleware('auth')->group(function () {
     // تفعيل بطاقة
     Route::post('/cards/{card}/activate', [CardController::class, 'activate'])
         ->name('cards.activate');
+
+    // Statistics
+    Route::get('/statistics', [\App\Http\Controllers\StatisticsController::class, 'index'])
+        ->name('statistics');
     
     // ═══════════════════════════════════════
     // Admin Routes (admin only)
