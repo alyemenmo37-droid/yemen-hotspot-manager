@@ -2,22 +2,25 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Card extends Model
 {
     use HasFactory;
-    
+
     // ═══════════════════════════════════════
     // الثوابت
     // ═══════════════════════════════════════
     public const STATUS_UNUSED = 'unused';
+
     public const STATUS_ACTIVE = 'active';
+
     public const STATUS_EXPIRED = 'expired';
+
     public const STATUS_STOPPED = 'stopped';
-    
+
     // ═══════════════════════════════════════
     // Mass Assignment Protection
     // الحقول المسموح بتعبئتها دفعة واحدة
@@ -32,7 +35,7 @@ class Card extends Model
         'activated_at',
         'expires_at',
     ];
-    
+
     // ═══════════════════════════════════════
     // Type Casting
     // تحويل الأنواع تلقائياً
@@ -46,11 +49,11 @@ class Card extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-    
+
     // ═══════════════════════════════════════
     // Accessors & Methods
     // ═══════════════════════════════════════
-    
+
     /**
      * هل البطاقة نشطة؟
      */
@@ -58,7 +61,7 @@ class Card extends Model
     {
         return $this->status === self::STATUS_ACTIVE;
     }
-    
+
     /**
      * هل البطاقة متاحة؟
      */
@@ -66,7 +69,7 @@ class Card extends Model
     {
         return $this->status === self::STATUS_UNUSED;
     }
-    
+
     /**
      * نسبة استهلاك البيانات
      */
@@ -75,9 +78,10 @@ class Card extends Model
         if (empty($this->data_limit_mb) || $this->data_limit_mb === 0) {
             return 0.0;
         }
+
         return round($this->data_used_mb / $this->data_limit_mb * 100, 1);
     }
-    
+
     /**
      * تفعيل البطاقة
      */
@@ -88,7 +92,7 @@ class Card extends Model
             'activated_at' => now(),
         ]);
     }
-    
+
     /**
      * إيقاف البطاقة
      */
@@ -96,7 +100,7 @@ class Card extends Model
     {
         $this->update(['status' => self::STATUS_STOPPED]);
     }
-    
+
     /**
      * إنهاء البطاقة
      */
@@ -104,7 +108,7 @@ class Card extends Model
     {
         $this->update(['status' => self::STATUS_EXPIRED]);
     }
-    
+
     /**
      * تسمية مختصرة
      */
@@ -117,32 +121,32 @@ class Card extends Model
             self::STATUS_STOPPED => '🛑',
             default => '❓',
         };
-        
+
         return "$emoji {$this->number} | {$this->amount} ريال | {$this->speed}";
     }
-    
+
     /**
      * إخفاء جزء من الرقم
      */
     public function maskedNumber(): string
     {
-        return substr($this->number, 0, 3) . '****' . substr($this->number, -3);
+        return substr($this->number, 0, 3).'****'.substr($this->number, -3);
     }
-    
+
     // ═══════════════════════════════════════
     // Scopes (استعلامات جاهزة)
     // ═══════════════════════════════════════
-    
+
     /**
      * بطاقات نشطة فقط
-     * 
+     *
      * الاستخدام: Card::active()->get()
      */
     public function scopeActive($query)
     {
         return $query->where('status', self::STATUS_ACTIVE);
     }
-    
+
     /**
      * بطاقات متاحة فقط
      */
@@ -150,7 +154,7 @@ class Card extends Model
     {
         return $query->where('status', self::STATUS_UNUSED);
     }
-    
+
     /**
      * بحث برقم البطاقة
      */
@@ -158,6 +162,7 @@ class Card extends Model
     {
         return $query->where('number', 'like', "%$number%");
     }
+
     /**
      * العلاقة: بطاقة → مستوى سرعة (belongsTo)
      */
@@ -166,4 +171,3 @@ class Card extends Model
         return $this->belongsTo(SpeedLevel::class);
     }
 }
-

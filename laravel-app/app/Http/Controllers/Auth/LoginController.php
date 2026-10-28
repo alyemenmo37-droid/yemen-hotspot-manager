@@ -15,7 +15,7 @@ class LoginController extends Controller
     {
         return view('auth.login');
     }
-    
+
     /**
      * معالجة تسجيل الدخول
      */
@@ -31,22 +31,22 @@ class LoginController extends Controller
             'password.required' => 'كلمة المرور مطلوبة',
             'password.min' => 'كلمة المرور 6 أحرف على الأقل',
         ]);
-        
+
         // 2. محاولة تسجيل الدخول
         $remember = $request->boolean('remember');
-        
+
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-            
+
             // تحديث آخر تسجيل دخول
             $user = Auth::user();
             $user->update(['last_login_at' => now()]);
-            
+
             return redirect()
                 ->intended(route('dashboard'))
                 ->with('success', "مرحباً بك {$user->name} 👋");
         }
-        
+
         // 3. فشل
         return back()
             ->withInput($request->only('email', 'remember'))
@@ -54,17 +54,17 @@ class LoginController extends Controller
                 'email' => 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
             ]);
     }
-    
+
     /**
      * تسجيل الخروج
      */
     public function logout(Request $request)
     {
         Auth::logout();
-        
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
+
         return redirect()
             ->route('login')
             ->with('success', 'تم تسجيل الخروج بنجاح');

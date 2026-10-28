@@ -84,3 +84,106 @@ php artisan migrate
 php artisan db:seed --class=CategorySpeedSeeder
 php artisan db:seed --class=UserSeeder
 php artisan serve
+
+# 📡 Yemen Hotspot Manager (YHM) v1.0
+
+<p align="center">
+  <strong>نظام احترافي لإدارة شبكات الواي فاي المدفوعة</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version">
+  <img src="https://img.shields.io/badge/laravel-13-red" alt="Laravel">
+  <img src="https://img.shields.io/badge/PHP-8.5-purple" alt="PHP">
+  <img src="https://img.shields.io/badge/MySQL-8-orange" alt="MySQL">
+  <img src="https://img.shields.io/badge/made_in-Yemen-🇾🇪-green" alt="Yemen">
+</p>
+
+## ✨ الميزات
+
+### 🎫 البطاقات
+- CRUD كامل (إضافة، عرض، تعديل، حذف)
+- تصنيفات (بطيء، متوسط، عالي، مفتوح)
+- مستويات سرعة (6 مستويات)
+- تتبع استهلاك البيانات
+- حالة (غير مستخدمة، نشطة، منتهية، موقوفة)
+
+### 👥 المستخدمون
+- 3 أدوار (مسؤول، مشرف، مشغل)
+- تسجيل دخول/خروج
+- إدارة مستخدمين (admin only)
+- الملف الشخصي
+- تغيير كلمة المرور
+
+### 🌐 MikroTik
+- Mock Mode (للتطوير)
+- Real Mode (للمحاكاة)
+- إضافة/حذف hotspot users
+- Active sessions
+- Traffic simulation
+- فصل مستخدمين
+
+### 📊 الإحصائيات
+- إحصائيات شاملة
+- مبيعات حسب الفئة
+- مبيعات يومية (7 أيام)
+- توزيع الحالات
+- Top 5 بطاقات
+- Audit log
+
+### 🎨 الواجهة
+- RTL عربي
+- Responsive (Mobile)
+- Live updates (5s polling)
+- Toast notifications
+- Beautiful design
+
+### 🔒 الأمان
+- CSRF protection
+- Auth middleware
+- Role-based access
+- Password hashing
+- Session security
+
+## 🛠️ التقنيات
+
+| الطبقة | التقنية |
+|--------|---------|
+| Backend | Laravel 13 |
+| PHP | 8.5.1 |
+| Database | MySQL 8 |
+| Frontend | Blade + Vanilla JS |
+| CSS | Inline |
+| Auth | Session-based |
+
+## 🚀 التثبيت
+
+### المتطلبات
+- PHP 8.3+
+- Composer
+- MySQL 8+
+- Node.js (optional)
+
+### الخطوات
+
+```bash
+# 1. استنساخ
+git clone https://github.com/alyemenmo37-droid/yemen-hotspot-manager.git
+cd yemen-hotspot-manager/laravel-app
+
+# 2. تثبيت
+composer install
+
+# 3. إعداد البيئة
+cp .env.example .env
+php artisan key:generate
+
+# 4. قاعدة البيانات
+# عدّل .env بـ DB info
+php artisan migrate
+php artisan db:seed --class=UserSeeder
+php artisan db:seed --class=CategorySpeedSeeder
+php artisan db:seed --class=SettingSeeder
+
+# 5. تشغيل
+php artisan serve

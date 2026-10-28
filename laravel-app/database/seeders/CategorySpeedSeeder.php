@@ -13,7 +13,7 @@ class CategorySpeedSeeder extends Seeder
         // ⚠️ حذف البيانات الموجودة أولاً
         SpeedLevel::query()->delete();
         Category::query()->delete();
-        
+
         $data = [
             [
                 'name' => 'بطيء',
@@ -54,20 +54,20 @@ class CategorySpeedSeeder extends Seeder
                 ],
             ],
         ];
-        
+
         foreach ($data as $catData) {
             $speeds = $catData['speeds'];
             unset($catData['speeds']);
-            
+
             $category = Category::create($catData);
-            
+
             foreach ($speeds as $speed) {
                 $category->speedLevels()->create($speed);
             }
-            
-            $this->command->info("✅ {$category->name}: " . count($speeds) . " مستوى");
+
+            $this->command->info("✅ {$category->name}: ".count($speeds).' مستوى');
         }
-        
-        $this->command->info('🎉 تم إنشاء ' . Category::count() . ' فئة و ' . SpeedLevel::count() . ' مستوى');
+
+        $this->command->info('🎉 تم إنشاء '.Category::count().' فئة و '.SpeedLevel::count().' مستوى');
     }
 }

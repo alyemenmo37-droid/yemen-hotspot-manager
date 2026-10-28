@@ -32,6 +32,43 @@
         </div>
     </div>
     
+{{-- MikroTik Logs --}}
+<div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-top: 20px;">
+    <h3 style="color: #009639; margin-bottom: 15px;">🌐 آخر عمليات MikroTik</h3>
+    
+    @if($mikrotikLogs->isEmpty())
+        <p style="text-align: center; color: #999; padding: 20px;">لا توجد عمليات</p>
+    @else
+        @foreach($mikrotikLogs as $log)
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">{{ $log->icon }}</span>
+                    <div>
+                        <div style="font-weight: bold; font-size: 14px;">
+                            {{ $log->action }}
+                            @if($log->card_number)
+                                <span style="font-family: monospace; color: #666;">{{ $log->card_number }}</span>
+                            @endif
+                        </div>
+                        <div style="font-size: 12px; color: #999;">
+                            {{ $log->user->name ?? 'مجهول' }} • {{ $log->created_at->diffForHumans() }}
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    @if($log->status === 'success')
+                        <span style="background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 12px; font-size: 12px;">✅</span>
+                    @else
+                        <span style="background: #ffebee; color: #c62828; padding: 4px 12px; border-radius: 12px; font-size: 12px;">❌</span>
+                    @endif
+                    <span style="font-size: 11px; color: #999; margin-right: 10px;">
+                        {{ $log->mode === 'mock' ? '🟡' : '🟢' }}
+                    </span>
+                </div>
+            </div>
+        @endforeach
+    @endif
+</div>
     {{-- 2. Sales by Category --}}
     <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 20px;">
         <h3 style="color: #009639; margin-bottom: 20px;">📁 المبيعات حسب الفئة</h3>

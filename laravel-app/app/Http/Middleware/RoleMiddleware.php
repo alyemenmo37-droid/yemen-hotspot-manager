@@ -10,21 +10,21 @@ class RoleMiddleware
 {
     /**
      * التحقق من دور واحد أو أكثر
-     * 
+     *
      * الاستخدام: middleware('role:admin,manager')
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return redirect()->route('login');
         }
-        
+
         $user = auth()->user();
-        
-        if (!in_array($user->role, $roles, true)) {
+
+        if (! in_array($user->role, $roles, true)) {
             abort(403, 'غير مصرح لك بالوصول');
         }
-        
+
         return $next($request);
     }
 }

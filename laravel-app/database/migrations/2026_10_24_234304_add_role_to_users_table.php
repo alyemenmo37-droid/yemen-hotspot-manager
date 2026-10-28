@@ -9,17 +9,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'role')) {
+            if (! Schema::hasColumn('users', 'role')) {
                 $table->enum('role', ['admin', 'manager', 'operator'])
                     ->default('operator')
                     ->after('password');
             }
-            
-            if (!Schema::hasColumn('users', 'is_active')) {
+
+            if (! Schema::hasColumn('users', 'is_active')) {
                 $table->boolean('is_active')->default(true)->after('role');
             }
-            
-            if (!Schema::hasColumn('users', 'last_login_at')) {
+
+            if (! Schema::hasColumn('users', 'last_login_at')) {
                 $table->timestamp('last_login_at')->nullable()->after('is_active');
             }
         });

@@ -16,17 +16,17 @@ class UserController extends Controller
     public function index()
     {
         $users = User::orderByDesc('created_at')->paginate(15);
-        
+
         $stats = [
             'total' => User::count(),
             'admins' => User::where('role', 'admin')->count(),
             'active' => User::where('is_active', true)->count(),
             'inactive' => User::where('is_active', false)->count(),
         ];
-        
+
         return view('admin.users.index', compact('users', 'stats'));
     }
-    
+
     /**
      * نموذج إضافة مستخدم
      */
@@ -34,7 +34,7 @@ class UserController extends Controller
     {
         return view('admin.users.create');
     }
-    
+
     /**
      * حفظ مستخدم جديد
      */
@@ -55,7 +55,7 @@ class UserController extends Controller
             'role.required' => 'الدور مطلوب',
             'role.in' => 'الدور غير صالح',
         ]);
-        
+
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -64,12 +64,12 @@ class UserController extends Controller
             'is_active' => $request->boolean('is_active', true),
             'email_verified_at' => now(),
         ]);
-        
+
         return redirect()
             ->route('admin.users.index')
             ->with('success', "تم إضافة المستخدم {$validated['name']}");
     }
-    
+
     /**
      * عرض مستخدم
      */
@@ -77,7 +77,7 @@ class UserController extends Controller
     {
         return view('admin.users.show', compact('user'));
     }
-    
+
     /**
      * نموذج تعديل
      */
@@ -85,7 +85,7 @@ class UserController extends Controller
     {
         return view('admin.users.edit', compact('user'));
     }
-    
+
     /**
      * حفظ التعديل
      */
@@ -93,31 +93,31 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'unique:users,email,' . $user->id],
+            'email' => ['required', 'email', 'unique:users,email,'.$user->id],
             'role' => ['required', 'in:admin,manager,operator'],
             'is_active' => ['boolean'],
             'password' => ['nullable', 'string', Password::min(8)->letters()->numbers()],
         ]);
-        
+
         $data = [
             'name' => $validated['name'],
             'email' => $validated['email'],
             'role' => $validated['role'],
             'is_active' => $request->boolean('is_active'),
         ];
-        
+
         // كلمة المرور اختيارية
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $data['password'] = Hash::make($validated['password']);
         }
-        
+
         $user->update($data);
-        
+
         return redirect()
             ->route('admin.users.index')
             ->with('success', "تم تعديل المستخدم {$user->name}");
     }
-    
+
     /**
      * حذف مستخدم
      */
@@ -127,20 +127,20 @@ class UserController extends Controller
         if ($user->id === auth()->id()) {
             return back()->with('error', 'لا يمكنك حذف حسابك الخاص!');
         }
-        
+
         // لا يمكن حذف آخر admin
         if ($user->isAdmin() && User::where('role', 'admin')->count() <= 1) {
             return back()->with('error', 'لا يمكن حذف آخر مسؤول!');
         }
-        
+
         $name = $user->name;
         $user->delete();
-        
+
         return redirect()
             ->route('admin.users.index')
             ->with('success', "تم حذف المستخدم $name");
     }
-    
+
     /**
      * تفعيل/إيقاف
      */
@@ -149,10 +149,11 @@ class UserController extends Controller
         if ($user->id === auth()->id()) {
             return back()->with('error', 'لا يمكنك إيقاف حسابك الخاص!');
         }
-        
-        $user->update(['is_active' => !$user->is_active]);
-        
+
+        $user->update(['is_active' => ! $user->is_active]);
+
         $status = $user->is_active ? 'تفعيل' : 'إيقاف';
+
         return back()->with('success', "تم $status المستخدم {$user->name}");
     }
 }

@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
-        
+
         // مشرف
         User::updateOrCreate(
             ['email' => 'manager@yhm.local'],
@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
-        
+
         // مشغل
         User::updateOrCreate(
             ['email' => 'operator@yhm.local'],
@@ -45,7 +45,7 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
-        
+
         $this->command->info('✅ 3 users created:');
         $this->command->info('   👤 admin@yhm.local / admin123');
         $this->command->info('   👤 manager@yhm.local / manager123');

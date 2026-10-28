@@ -14,11 +14,11 @@ class Category extends Model
         'description',
         'is_active',
     ];
-    
+
     protected $casts = [
         'is_active' => 'boolean',
     ];
-    
+
     /**
      * العلاقة: فئة → مستويات سرعة (hasMany)
      */
@@ -26,7 +26,7 @@ class Category extends Model
     {
         return $this->hasMany(SpeedLevel::class);
     }
-    
+
     /**
      * عدد البطاقات في الفئة
      */

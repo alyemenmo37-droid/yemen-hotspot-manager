@@ -11,7 +11,7 @@ return [
     'username' => env('MIKROTIK_USERNAME', 'admin'),
     'password' => env('MIKROTIK_PASSWORD', ''),
     'timeout' => env('MIKROTIK_TIMEOUT', 5),
-    
+
     /*
     |--------------------------------------------------------------------------
     | Mock Mode (للتطوير)
@@ -20,7 +20,7 @@ return [
     | false = اتصال حقيقي
     */
     'mock' => env('MIKROTIK_MOCK', true),
-    
+
     /*
     |--------------------------------------------------------------------------
     | Hotspot Settings

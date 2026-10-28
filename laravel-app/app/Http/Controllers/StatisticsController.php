@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Card;
 use App\Models\Category;
-use App\Models\SpeedLevel;
+use App\Models\MikrotikLog;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class StatisticsController extends Controller
 {
@@ -27,7 +25,7 @@ class StatisticsController extends Controller
             'total_sales' => Card::where('status', '!=', 'unused')->sum('amount'),
             'total_users' => User::count(),
         ];
-        
+
         // ═══════════════════════════════════════
         // 2. المبيعات حسب الفئة
         // ═══════════════════════════════════════
@@ -40,11 +38,11 @@ class StatisticsController extends Controller
             ->leftJoin('speed_levels', 'speed_levels.category_id', '=', 'categories.id')
             ->leftJoin('cards', function ($join) {
                 $join->on('cards.speed_level_id', '=', 'speed_levels.id')
-                     ->where('cards.status', '!=', 'unused');
+                    ->where('cards.status', '!=', 'unused');
             })
             ->groupBy('categories.id', 'categories.name', 'categories.slug', 'categories.color', 'categories.description', 'categories.is_active', 'categories.created_at', 'categories.updated_at')
             ->get();
-        
+
         // ═══════════════════════════════════════
         // 3. المبيعات اليومية (آخر 7 أيام)
         // ═══════════════════════════════════════
@@ -57,7 +55,7 @@ class StatisticsController extends Controller
             ->groupBy('date')
             ->orderBy('date')
             ->get();
-        
+
         // ═══════════════════════════════════════
         // 4. أعلى 5 بطاقات
         // ═══════════════════════════════════════
@@ -66,7 +64,7 @@ class StatisticsController extends Controller
             ->orderByDesc('amount')
             ->limit(5)
             ->get();
-        
+
         // ═══════════════════════════════════════
         // 5. توزيع الحالات
         // ═══════════════════════════════════════
@@ -76,13 +74,20 @@ class StatisticsController extends Controller
         ')
             ->groupBy('status')
             ->get();
-        
+
+        // MikroTik Logs
+        $mikrotikLogs = MikrotikLog::with('user')
+            ->orderByDesc('created_at')
+            ->limit(10)
+            ->get();
+
         return view('statistics.index', compact(
             'general',
             'salesByCategory',
             'dailySales',
             'topCards',
-            'statusDistribution'
+            'statusDistribution',
+            'mikrotikLogs'
         ));
     }
 }

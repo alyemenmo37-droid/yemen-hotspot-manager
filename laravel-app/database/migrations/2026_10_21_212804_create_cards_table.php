@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamp('activated_at')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->timestamps(); // created_at + updated_at
-            
+
             // Indexes
             $table->index('status');
             $table->index('created_at');

@@ -18,7 +18,7 @@ class SpeedLevel extends Model
         'is_default',
         'is_active',
     ];
-    
+
     protected $casts = [
         'price' => 'integer',
         'duration_minutes' => 'integer',
@@ -26,7 +26,7 @@ class SpeedLevel extends Model
         'is_default' => 'boolean',
         'is_active' => 'boolean',
     ];
-    
+
     /**
      * العلاقة: مستوى سرعة → فئة (belongsTo)
      */
@@ -34,7 +34,7 @@ class SpeedLevel extends Model
     {
         return $this->belongsTo(Category::class);
     }
-    
+
     /**
      * العلاقة: مستوى سرعة → بطاقات (hasMany)
      */
@@ -42,17 +42,24 @@ class SpeedLevel extends Model
     {
         return $this->hasMany(Card::class);
     }
-    
+
     /**
      * تنسيق المدة
      */
     public function durationFormatted(): string
     {
         $minutes = $this->duration_minutes;
-        
-        if ($minutes < 60) return "$minutes دقيقة";
-        if ($minutes < 1440) return round($minutes / 60) . " ساعة";
-        if ($minutes < 10080) return round($minutes / 1440) . " يوم";
-        return round($minutes / 10080) . " أسبوع";
+
+        if ($minutes < 60) {
+            return "$minutes دقيقة";
+        }
+        if ($minutes < 1440) {
+            return round($minutes / 60).' ساعة';
+        }
+        if ($minutes < 10080) {
+            return round($minutes / 1440).' يوم';
+        }
+
+        return round($minutes / 10080).' أسبوع';
     }
 }

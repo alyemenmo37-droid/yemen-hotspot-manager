@@ -53,4 +53,27 @@
             <p style="color: #666; font-size: 14px;">إعدادات النظام العامة</p>
         </a>
     </div>
+    {{-- System Settings Preview --}}
+    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-top: 20px;">
+        <h3 style="color: #009639; margin-bottom: 15px;">⚙️ الإعدادات الحالية</h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; font-size: 14px;">
+            <div>
+                <strong style="color: #666;">🏷️ اسم الموقع:</strong><br>
+                {{ \App\Models\Setting::get('site_name', 'YHM') }}
+            </div>
+            <div>
+                <strong style="color: #666;">🌐 MikroTik:</strong><br>
+                {{ \App\Models\Setting::get('mikrotik_enabled', true) ? '✅ مفعل' : '❌ معطل' }}
+            </div>
+            <div>
+                <strong style="color: #666;">⚠️ تنبيه المخزون:</strong><br>
+                عند {{ \App\Models\Setting::get('low_stock_threshold', 10) }} بطاقة
+            </div>
+            <div>
+                <strong style="color: #666;">🎫 مدة البطاقة:</strong><br>
+                {{ \App\Models\Setting::get('card_default_duration', 1440) }} دقيقة
+            </div>
+        </div>
+    </div>
 @endsection

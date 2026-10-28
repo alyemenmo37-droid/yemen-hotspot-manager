@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         // ⚠️ لا نضيف العمود إذا كان موجوداً
-        if (!Schema::hasColumn('cards', 'speed_level_id')) {
+        if (! Schema::hasColumn('cards', 'speed_level_id')) {
             Schema::table('cards', function (Blueprint $table) {
                 $table->foreignId('speed_level_id')
                     ->nullable()
