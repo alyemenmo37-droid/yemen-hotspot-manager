@@ -13,8 +13,10 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    // 'name' => env('APP_NAME', 'Laravel'),
 
+    'name' => env('APP_NAME', 'Yemen Hotspot Manager'),
+    'version' => '2.0.0',
     /*
     |--------------------------------------------------------------------------
     | Application Environment

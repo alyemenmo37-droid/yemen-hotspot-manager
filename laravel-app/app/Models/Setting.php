@@ -4,30 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
-use App\Models\Setting;
+
 class Setting extends Model
 {
     protected $fillable = ['key', 'value', 'type', 'group'];
     
     /**
      * جلب إعداد
+     * 
+     * ⚠️ مهم: نخزن القيمة فقط، وليس Model
      */
     public static function get(string $key, mixed $default = null): mixed
     {
-        $cached = Cache::remember("setting:{$key}", 3600, function () use ($key) {
-            return static::where('key', $key)->first();
+        // خزّن القيمة المحسوبة (int/bool/string) — وليس Model
+        return Cache::remember("setting:{$key}", 3600, function () use ($key, $default) {
+            $setting = static::where('key', $key)->first();
+            
+            if (!$setting) {
+                return $default;
+            }
+            
+            return match ($setting->type) {
+                'int' => (int) $setting->value,
+                'bool' => (bool) $setting->value,
+                'json' => json_decode($setting->value, true),
+                default => $setting->value,
+            };
         });
-        
-        if (!$cached) {
-            return $default;
-        }
-        
-        return match ($cached->type) {
-            'int' => (int) $cached->value,
-            'bool' => (bool) $cached->value,
-            'json' => json_decode($cached->value, true),
-            default => $cached->value,
-        };
     }
     
     /**

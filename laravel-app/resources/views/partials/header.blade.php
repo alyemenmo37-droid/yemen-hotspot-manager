@@ -6,6 +6,10 @@
         
         @auth
             <nav class="nav">
+		<a href="{{ route('accounting.index') }}" 
+		   class="{{ request()->routeIs('accounting.*') ? 'active' : '' }}">
+		    📊 المحاسبة
+		</a>
                 <a href="{{ route('dashboard') }}" 
                    class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     📊 لوحة التحكم

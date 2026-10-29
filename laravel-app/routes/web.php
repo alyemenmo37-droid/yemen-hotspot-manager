@@ -55,10 +55,46 @@ Route::post('/logout', [LoginController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
+// Health Check (public, minimal)
+Route::get('/health', function () {
+    try {
+        \DB::select('SELECT 1');
+        \Cache::put('health_ping', 'ok', 60);
+        
+        return response()->json([
+            'status' => 'ok',
+            'time' => now()->toDateTimeString(),
+            'version' => '1.0.0',
+            'app' => 'YHM',
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'service unavailable',
+        ], 503);
+    }
+})->name('health');
+
 // ═══════════════════════════════════════
 // 3. Routes محمية (تحتاج تسجيل دخول)
 // ═══════════════════════════════════════
 Route::middleware('auth')->group(function () {
+
+    // Sync Accounting
+    Route::post('/radius/sync-accounting', function (\App\Services\Radius\RadiusService $radius) {
+        $stats = $radius->syncDataUsage();
+        return back()->with('success', 
+            "تم تحديث {$stats['updated']} بطاقة، تجاوز {$stats['exceeded']}"
+        );
+    })->name('radius.sync-accounting');
+
+    // Accounting Reports
+    Route::get('/accounting', function (\App\Services\Radius\RadiusService $radius) {
+        $overall = $radius->getOverallStats();
+        $topConsumers = $radius->getTopConsumers(20);
+        
+        return view('accounting.index', compact('overall', 'topConsumers'));
+    })->name('accounting.index');
 
     // Profile
     Route::prefix('profile')->name('profile.')->group(function () {

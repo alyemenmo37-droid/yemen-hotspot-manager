@@ -128,6 +128,9 @@ class CardController extends Controller
         // 1. حذف من MikroTik
         $mikrotik->removeUser($number);
 
+        // 2. حذف من radacct (اختياري)
+        \DB::table('radacct')->where('username', $number)->delete();
+
         // 2. حذف من DB
         $card->delete();
 
