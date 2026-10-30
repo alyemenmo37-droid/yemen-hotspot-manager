@@ -80,6 +80,16 @@ Route::get('/health', function () {
 // ═══════════════════════════════════════
 Route::middleware('auth')->group(function () {
 
+    // Reports
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\ReportController::class, 'index'])->name('index');
+        Route::get('/cards/pdf', [\App\Http\Controllers\ReportController::class, 'cardsPdf'])->name('cards.pdf');
+        Route::get('/cards/csv', [\App\Http\Controllers\ReportController::class, 'cardsCsv'])->name('cards.csv');
+        Route::get('/sales/pdf', [\App\Http\Controllers\ReportController::class, 'salesPdf'])->name('sales.pdf');
+        Route::get('/usage/pdf', [\App\Http\Controllers\ReportController::class, 'usagePdf'])->name('usage.pdf');
+        Route::get('/usage/csv', [\App\Http\Controllers\ReportController::class, 'usageCsv'])->name('usage.csv');
+    });
+
     // Sync Accounting
     Route::post('/radius/sync-accounting', function (\App\Services\Radius\RadiusService $radius) {
         $stats = $radius->syncDataUsage();
