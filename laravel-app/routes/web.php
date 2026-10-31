@@ -48,9 +48,8 @@ Route::get('/about', function () {
 // ═══════════════════════════════════════
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+    Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:5,1')->name('login.post');
 });
-
 Route::post('/logout', [LoginController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
@@ -178,6 +177,19 @@ Route::middleware('auth')->group(function () {
             return back()->with('success', "تم مزامنة $success بطاقة");
         })->name('sync');
     });
+
+// Test Notifications (Admin only)
+Route::prefix('admin/notifications')->name('admin.notifications.')->middleware('admin')->group(function () {
+    Route::post('/test', function (\App\Services\TelegramService $telegram) {
+        $result = $telegram->test();
+        return back()->with($result['success'] ? 'success' : 'error', $result['message']);
+    })->name('test');
+    
+    Route::post('/test-low-stock', function (\App\Services\TelegramService $telegram) {
+        $telegram->notifyLowStock(5, 10);
+        return back()->with('success', 'تم إرسال تنبيه المخزون');
+    })->name('low-stock');
+});
 
     // ═══════════════════════════════════════
     // Admin Routes (admin only)

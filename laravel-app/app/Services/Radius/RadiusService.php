@@ -188,72 +188,50 @@ public function closeSession(string $acctSessionId): void
  */
 public function syncDataUsage(): array
 {
-    $stats = [
-        'updated' => 0,
-        'exceeded' => 0,
-        'errors' => 0,
-    ];
+    $stats = ['updated' => 0, 'exceeded' => 0, 'errors' => 0];
+    $telegram = app(\App\Services\TelegramService::class);
     
-    // ═══════════════════════════════════════
-    // 1. جلب مجموع الاستهلاك لكل مستخدم
-    // ═══════════════════════════════════════
     $usage = DB::table('radacct')
         ->select('username')
-        ->selectRaw('
-            COALESCE(SUM(acctinputoctets), 0) AS total_in,
-            COALESCE(SUM(acctoutputoctets), 0) AS total_out,
-            COALESCE(SUM(acctinputoctets + acctoutputoctets), 0) AS total_bytes
-        ')
+        ->selectRaw('COALESCE(SUM(acctinputoctets + acctoutputoctets), 0) AS total_bytes')
         ->whereNotNull('username')
         ->where('username', '!=', '')
         ->groupBy('username')
         ->get();
     
-    // ═══════════════════════════════════════
-    // 2. تحديث كل بطاقة
-    // ═══════════════════════════════════════
     foreach ($usage as $row) {
         try {
             $usedMb = (int) round($row->total_bytes / 1024 / 1024);
-            
             $card = \App\Models\Card::where('number', $row->username)->first();
             
-            if (!$card) {
-                continue;
-            }
+            if (!$card) continue;
             
-            // تحديث الاستهلاك
-            $oldUsed = $card->data_used_mb;
             $card->update(['data_used_mb' => $usedMb]);
             $stats['updated']++;
             
-            // ═══════════════════════════════════════
-            // 3. فحص التجاوز
-            // ═══════════════════════════════════════
+            // تجاوز الحد
             if ($card->data_limit_mb > 0 && $usedMb >= $card->data_limit_mb) {
                 $stats['exceeded']++;
                 
-                // سجل التجاوز
-                \Log::warning('Data limit exceeded', [
-                    'card' => $card->number,
-                    'limit_mb' => $card->data_limit_mb,
-                    'used_mb' => $usedMb,
-                ]);
-                
-                // إرسال CoA Disconnect
                 $coa = new CoaClient();
-                $coa->disconnect($card->number);
+                $result = $coa->disconnect($card->number);
                 
-                // تغيير الحالة
-                $card->update(['status' => \App\Models\Card::STATUS_EXPIRED]);
+                if ($result['success']) {
+                    $card->update(['status' => \App\Models\Card::STATUS_EXPIRED]);
+                    
+                    // إشعار Telegram
+                    $telegram->notifyLimitExceeded(
+                        $card->number,
+                        $card->data_limit_mb,
+                        $usedMb
+                    );
+                } else {
+                    // فشل CoA
+                    $telegram->notifyCoaFailure($card->number, $result['message']);
+                }
             }
-            
         } catch (\Throwable $e) {
             $stats['errors']++;
-            \Log::error('Sync usage error', [
-                'username' => $row->username,
-                'error' => $e->getMessage(),
-            ]);
         }
     }
     

@@ -38,50 +38,51 @@ class CardController extends Controller
 
         return view('cards.create', compact('speedLevels'));
     }
-
-    public function store(Request $request, MikroTikService $mikrotik)
-    {
-        $validated = $request->validate([
-            'number' => ['required', 'digits:10', 'unique:cards,number'],
-            'speed_level_id' => ['required', 'exists:speed_levels,id'],
-            'data_limit_mb' => ['nullable', 'integer', 'min:0'],
-        ], [
-            'number.required' => 'رقم البطاقة مطلوب',
-            'number.digits' => 'رقم البطاقة يجب أن يكون 10 أرقام',
-            'number.unique' => 'رقم البطاقة موجود مسبقاً',
-            'speed_level_id.required' => 'السرعة مطلوبة',
-        ]);
-
-        $speedLevel = SpeedLevel::findOrFail($validated['speed_level_id']);
-
-        // 1. إضافة إلى MikroTik
-        $duration = '1d'; // يمكن حسابها من speedLevel
-        $mikrotikResult = $mikrotik->addUser(
-            $validated['number'],
-            $speedLevel->rate_limit,
-            $duration
-        );
-
-        if (! $mikrotikResult['success']) {
-            return back()
-                ->withInput()
-                ->with('error', 'فشل MikroTik: '.$mikrotikResult['message']);
-        }
-
-        // 2. حفظ في قاعدة البيانات
-        Card::create([
-            'number' => $validated['number'],
-            'amount' => $speedLevel->price,
-            'speed' => $speedLevel->rate_limit,
-            'speed_level_id' => $speedLevel->id,
-            'status' => Card::STATUS_UNUSED,
-            'data_limit_mb' => $validated['data_limit_mb'] ?? $speedLevel->data_limit_mb,
-        ]);
-
-        return redirect()
-            ->route('cards.index')
-            ->with('success', "تم إضافة البطاقة {$validated['number']} (MikroTik: {$mikrotikResult['mode']})");
+public function store(Request $request, \App\Services\MikroTikService $mikrotik, \App\Services\TelegramService $telegram)
+{
+    $validated = $request->validate([
+        'number' => ['required', 'digits:10', 'unique:cards,number'],
+        'speed_level_id' => ['required', 'exists:speed_levels,id'],
+    ]);
+    
+    $speedLevel = SpeedLevel::findOrFail($validated['speed_level_id']);
+    
+    // MikroTik
+    $result = $mikrotik->addUser($validated['number'], $speedLevel->rate_limit);
+    if (!$result['success']) {
+        return back()->with('error', $result['message']);
     }
+    
+    // DB
+    $card = Card::create([
+        'number' => $validated['number'],
+        'amount' => $speedLevel->price,
+        'speed' => $speedLevel->rate_limit,
+        'speed_level_id' => $speedLevel->id,
+        'status' => Card::STATUS_UNUSED,
+        'data_limit_mb' => $speedLevel->data_limit_mb,
+    ]);
+    
+    // إشعار Telegram
+    $telegram->notifyNewCard($card->number, $card->amount, $card->speed);
+    
+    // فحص المخزون
+    $this->checkLowStock($telegram);
+    
+    return redirect()
+        ->route('cards.index')
+        ->with('success', "تم إضافة {$card->number}");
+}
+
+private function checkLowStock(\App\Services\TelegramService $telegram): void
+{
+    $threshold = config('notifications.low_stock_threshold', 10);
+    $unused = Card::where('status', Card::STATUS_UNUSED)->count();
+    
+    if ($unused <= $threshold) {
+        $telegram->notifyLowStock($unused, $threshold);
+    }
+}
 
     public function show(Card $card)
     {

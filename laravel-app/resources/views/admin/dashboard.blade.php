@@ -76,4 +76,34 @@
             </div>
         </div>
     </div>
+    {{-- Notifications Test --}}
+    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-top: 20px;">
+        <h3 style="color: #009639; margin-bottom: 15px;">🔔 اختبار الإشعارات</h3>
+        
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <form method="POST" action="{{ route('admin.notifications.test') }}">
+                @csrf
+                <button type="submit" style="background: #1565c0; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    🧪 اختبار Telegram
+                </button>
+            </form>
+            
+            <form method="POST" action="{{ route('admin.notifications.low-stock') }}">
+                @csrf
+                <button type="submit" style="background: #f57c00; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    📦 تنبيه مخزون
+                </button>
+            </form>
+        </div>
+        
+        @if(config('notifications.telegram.enabled') && config('notifications.telegram.token'))
+            <p style="color: #2e7d32; margin-top: 15px; font-size: 13px;">
+                ✅ Telegram مُعد
+            </p>
+        @else
+            <p style="color: #c62828; margin-top: 15px; font-size: 13px;">
+                ⚠️ Telegram غير مُعد. أضف TELEGRAM_BOT_TOKEN و TELEGRAM_CHAT_ID في .env
+            </p>
+        @endif
+    </div>
 @endsection
