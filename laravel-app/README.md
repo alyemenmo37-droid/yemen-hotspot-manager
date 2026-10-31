@@ -1,5 +1,4 @@
-# 📡 Yemen Hotspot Manager (YHM)
-
+# 📡 Yemen Hotspot Manager (YHM) v2.1
 <p align="center">
   <img src="https://img.shields.io/badge/version-2.0.0-blue?style=for-the-badge" alt="Version">
   <img src="https://img.shields.io/badge/Laravel-13-red?style=for-the-badge&logo=laravel" alt="Laravel">
@@ -11,6 +10,15 @@
 <p align="center">
   <strong>نظام احترافي لإدارة شبكات الواي فاي المدفوعة</strong>
 </p>
+## 🎉 الإصدار 2.1.0
+### ✨ الجديد في v2.1
+- 📱 Mobile API (Sanctum)
+- 📄 PDF Reports (Cards, Sales, Usage)
+- 📊 CSV Export (Excel compatible)
+- 🔔 Telegram Notifications
+- 🔍 Advanced Search + Filters
+- ⚡ Bulk Actions
+- 📈 Accounting Dashboard
 
 ## 🎯 ما هو YHM؟
 

@@ -3,7 +3,7 @@
         <div style="font-size: 24px; margin-bottom: 10px;">📡 Yemen Hotspot Manager</div>
         
 	<div style="opacity: 0.8; margin-bottom: 15px;">
-	    v{{ config('app.version', '2.0.0') }} — Production Edition
+	    v{{ config('app.version', '2.1.0') }} — Production Edition
 	</div>
 
         <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; font-size: 13px; opacity: 0.7; margin-bottom: 15px;">

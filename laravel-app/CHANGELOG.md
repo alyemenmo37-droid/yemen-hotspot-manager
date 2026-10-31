@@ -1,4 +1,86 @@
 # Changelog
+## [2.1.0] - 2026-11-05
+
+### ✨ الجديد
+
+#### 📱 Mobile API
+- Laravel Sanctum Integration
+- 11 API endpoints
+- Token-based auth
+- Rate limiting (5/min login)
+- API Resources
+
+#### 📄 PDF Reports
+- Cards Report (landscape)
+- Sales Report (portrait)
+- Usage Report (top 30)
+- Arabic RTL support
+- DejaVu Sans font
+
+#### 📊 CSV Export
+- Cards CSV
+- Usage CSV
+- UTF-8 BOM (Excel compatible)
+
+#### 🔔 Notifications
+- Telegram Bot integration
+- 5 notification types:
+  - New card
+  - Data limit exceeded
+  - Low stock
+  - New user
+  - CoA failure
+- Auto-alerts
+
+#### 🔍 Advanced Features
+- Advanced Search (by number)
+- Multi-filter (status, category, price)
+- Sort options (4 types)
+- Bulk actions (activate, expire, delete)
+- Select all
+- Bulk action bar
+
+#### 📈 Accounting
+- RADIUS Accounting dashboard
+- Top consumers
+- Overall stats (GB, sessions)
+- Manual sync button
+
+### 🐛 إصلاحات
+- Fixed missing `create()` method in CardController
+- Fixed search behavior (correct LIKE queries)
+- Fixed all cache issues
+
+### 📊 الإحصائيات
+- Routes: 55
+- Commands: 8
+- API Endpoints: 11
+- Notification Types: 5
+- Report Templates: 3
+- Migrations: 12
+
+### 🎯 الميزات الكاملة
+- Authentication (3 roles)
+- Cards CRUD
+- Categories & Speed Levels
+- User Management
+- Profile
+- Statistics
+- MikroTik (mock + real)
+- RADIUS
+- CoA
+- Accounting
+- Real-time Updates
+- API (Mobile)
+- PDF Reports
+- CSV Export
+- Telegram Notifications
+- Advanced Search
+- Bulk Actions
+
+---
+
+## [2.0.0] - 2026-10-31
 
 ## [1.0.0] - 2026-10-28
 
