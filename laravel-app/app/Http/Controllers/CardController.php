@@ -9,35 +9,72 @@ use Illuminate\Http\Request;
 
 class CardController extends Controller
 {
-    public function index()
-    {
-        $cards = Card::with('speedLevel.category')
-            ->orderByDesc('created_at')
-            ->paginate(15);
-
-        $stats = [
-            'total' => Card::count(),
-            'active' => Card::where('status', Card::STATUS_ACTIVE)->count(),
-            'unused' => Card::where('status', Card::STATUS_UNUSED)->count(),
-            'sales' => Card::where('status', '!=', Card::STATUS_UNUSED)->sum('amount'),
-        ];
-
-        return view('cards.index', compact('cards', 'stats'));
+public function index(Request $request)
+{
+    $query = Card::with('speedLevel.category');
+    
+    // ═══════════════════════════════════════
+    // 1. البحث المتقدم
+    // ═══════════════════════════════════════
+    if ($search = $request->input('search')) {
+        $query->where(function ($q) use ($search) {
+            $q->where('number', 'like', "%{$search}%");
+        });
     }
-
-    public function create()
-    {
-        if (! auth()->user()->isAdmin() && auth()->user()->role !== 'manager') {
-            abort(403, 'غير مصرح بإضافة بطاقات');
-        }
-
-        $speedLevels = SpeedLevel::with('category')
-            ->where('is_active', true)
-            ->get()
-            ->groupBy('category.name');
-
-        return view('cards.create', compact('speedLevels'));
+    
+    // ═══════════════════════════════════════
+    // 2. فلترة متقدمة
+    // ═══════════════════════════════════════
+    
+    // الحالة
+    if ($status = $request->input('status')) {
+        $query->where('status', $status);
     }
+    
+    // الفئة
+    if ($categoryId = $request->input('category_id')) {
+        $query->whereHas('speedLevel', function ($q) use ($categoryId) {
+            $q->where('category_id', $categoryId);
+        });
+    }
+    
+    // السعر (من - إلى)
+    if ($min = $request->input('min_price')) {
+        $query->where('amount', '>=', (int) $min);
+    }
+    if ($max = $request->input('max_price')) {
+        $query->where('amount', '<=', (int) $max);
+    }
+    
+    // ═══════════════════════════════════════
+    // 3. الترتيب
+    // ═══════════════════════════════════════
+    $sort = $request->input('sort', 'created_at');
+    $order = $request->input('order', 'desc');
+    $query->orderBy($sort, $order);
+    
+    $cards = $query->paginate(20)->withQueryString();
+    
+    $stats = [
+        'total' => Card::count(),
+        'active' => Card::where('status', Card::STATUS_ACTIVE)->count(),
+        'unused' => Card::where('status', Card::STATUS_UNUSED)->count(),
+        'sales' => Card::where('status', '!=', Card::STATUS_UNUSED)->sum('amount'),
+    ];
+    
+    $categories = \App\Models\Category::all();
+    
+    return view('cards.index', compact('cards', 'stats', 'categories'));
+}
+public function create()
+{
+    $speedLevels = SpeedLevel::with('category')
+        ->where('is_active', true)
+        ->get()
+        ->groupBy('category.name');
+    
+    return view('cards.create', compact('speedLevels'));
+}
 public function store(Request $request, \App\Services\MikroTikService $mikrotik, \App\Services\TelegramService $telegram)
 {
     $validated = $request->validate([
@@ -148,4 +185,57 @@ private function checkLowStock(\App\Services\TelegramService $telegram): void
             ->route('cards.index')
             ->with('success', "تم تفعيل البطاقة {$card->number}");
     }
+/**
+ * إجراء جماعي
+ */
+public function bulkAction(Request $request, MikroTikService $mikrotik)
+{
+    $validated = $request->validate([
+        'action' => ['required', 'in:activate,delete,expire'],
+        'cards' => ['required', 'array'],
+        'cards.*' => ['integer', 'exists:cards,id'],
+    ]);
+    
+    $ids = $validated['cards'];
+    $action = $validated['action'];
+    
+    $cards = Card::whereIn('id', $ids)->get();
+    $count = 0;
+    
+    foreach ($cards as $card) {
+        try {
+            switch ($action) {
+                case 'activate':
+                    if ($card->isAvailable()) {
+                        $card->activate();
+                        $count++;
+                    }
+                    break;
+                    
+                case 'delete':
+                    $mikrotik->removeUser($card->number);
+                    $card->delete();
+                    $count++;
+                    break;
+                    
+                case 'expire':
+                    if ($card->status !== Card::STATUS_EXPIRED) {
+                        $card->expire();
+                        $count++;
+                    }
+                    break;
+            }
+        } catch (\Throwable $e) {
+            \Log::error("Bulk {$action} failed for {$card->number}", ['error' => $e->getMessage()]);
+        }
+    }
+    
+    $actionLabels = [
+        'activate' => 'تفعيل',
+        'delete' => 'حذف',
+        'expire' => 'إنهاء',
+    ];
+    
+    return back()->with('success', "تم {$actionLabels[$action]} {$count} بطاقة");
+}
 }

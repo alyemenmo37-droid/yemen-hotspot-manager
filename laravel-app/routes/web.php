@@ -126,7 +126,10 @@ Route::middleware('auth')->group(function () {
     // Cards (Resource)
     Route::resource('cards', CardController::class);
 
-    // تفعيل بطاقة
+    // Bulk Actions
+    Route::post('/cards/bulk-action', [\App\Http\Controllers\CardController::class, 'bulkAction'])
+        ->name('cards.bulk-action');
+        // تفعيل بطاقة
     Route::post('/cards/{card}/activate', [CardController::class, 'activate'])
         ->name('cards.activate');
 
