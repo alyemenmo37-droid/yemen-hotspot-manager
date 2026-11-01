@@ -10,7 +10,7 @@ until php artisan db:show > /dev/null 2>&1; do
 done
 echo "✅ Database ready"
 
-# Run migrations (only if not cached)
+# Run migrations
 if [ ! -f /var/www/html/storage/.migrated ]; then
     echo "📊 Running migrations..."
     php artisan migrate --force
@@ -21,13 +21,13 @@ if [ ! -f /var/www/html/storage/.migrated ]; then
     echo "✅ Migrations complete"
 fi
 
-# Generate key if not set
+# Generate key
 if [ -z "$APP_KEY" ]; then
     echo "🔑 Generating app key..."
     php artisan key:generate --force
 fi
 
-# Cache configuration
+# Cache
 echo "⚡ Optimizing..."
 php artisan config:cache
 php artisan route:cache
@@ -41,5 +41,4 @@ fi
 echo "✅ YHM ready!"
 echo "🌐 Starting services..."
 
-# Start supervisor
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
