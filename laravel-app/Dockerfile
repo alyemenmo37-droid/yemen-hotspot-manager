@@ -1,28 +1,7 @@
 # ═══════════════════════════════════════
-# YHM - Dockerfile
-# Multi-stage build for production
+# YHM - Simplified Dockerfile
 # ═══════════════════════════════════════
 
-# ═══════════════════════════════════════
-# Stage 1: Composer dependencies
-# ═══════════════════════════════════════
-FROM composer:2.10 AS composer
-
-WORKDIR /app
-
-COPY composer.json composer.lock ./
-
-RUN composer install \
-    --no-dev \
-    --no-interaction \
-    --no-scripts \
-    --prefer-dist \
-    --optimize-autoloader \
-    --ignore-platform-reqs
-
-# ═══════════════════════════════════════
-# Stage 2: Production
-# ═══════════════════════════════════════
 FROM php:8.3-fpm-alpine
 
 # Install system dependencies
@@ -38,7 +17,9 @@ RUN apk add --no-cache \
     oniguruma-dev \
     icu-dev \
     mysql-client \
-    bash
+    bash \
+    nodejs \
+    npm
 
 # Install PHP extensions
 RUN docker-php-ext-install \
@@ -53,7 +34,7 @@ RUN docker-php-ext-install \
 # Configure PHP
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-# OPcache settings
+# Configure OPcache
 RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.memory_consumption=256" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.max_accelerated_files=20000" >> /usr/local/etc/php/conf.d/opcache.ini \
@@ -62,13 +43,22 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy composer dependencies from stage 1
-COPY --from=composer /app/vendor ./vendor
+# Copy composer from official image
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Copy application files
+# Copy application
 COPY . .
 
-# Create necessary directories
+# Install composer dependencies
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --no-scripts \
+    --prefer-dist \
+    --optimize-autoloader \
+    --ignore-platform-reqs
+
+# Create directories
 RUN mkdir -p \
     storage/framework/cache/data \
     storage/framework/sessions \
@@ -78,29 +68,54 @@ RUN mkdir -p \
     bootstrap/cache
 
 # Set permissions
-RUN chown -R www-data:www-data \
-    storage \
-    bootstrap/cache \
-    && chmod -R 775 \
-    storage \
-    bootstrap/cache
+RUN chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
-# Copy nginx config
-COPY docker/nginx.conf /etc/nginx/nginx.conf
+# Copy nginx config (inline)
+RUN echo 'worker_processes auto;' > /etc/nginx/nginx.conf && \
+    echo 'events { worker_connections 1024; }' >> /etc/nginx/nginx.conf && \
+    echo 'http {' >> /etc/nginx/nginx.conf && \
+    echo '    include /etc/nginx/mime.types;' >> /etc/nginx/nginx.conf && \
+    echo '    default_type application/octet-stream;' >> /etc/nginx/nginx.conf && \
+    echo '    sendfile on;' >> /etc/nginx/nginx.conf && \
+    echo '    keepalive_timeout 65;' >> /etc/nginx/nginx.conf && \
+    echo '    client_max_body_size 20M;' >> /etc/nginx/nginx.conf && \
+    echo '    server {' >> /etc/nginx/nginx.conf && \
+    echo '        listen 80;' >> /etc/nginx/nginx.conf && \
+    echo '        server_name _;' >> /etc/nginx/nginx.conf && \
+    echo '        root /var/www/html/public;' >> /etc/nginx/nginx.conf && \
+    echo '        index index.php;' >> /etc/nginx/nginx.conf && \
+    echo '        charset utf-8;' >> /etc/nginx/nginx.conf && \
+    echo '        location / {' >> /etc/nginx/nginx.conf && \
+    echo '            try_files $uri $uri/ /index.php?$query_string;' >> /etc/nginx/nginx.conf && \
+    echo '        }' >> /etc/nginx/nginx.conf && \
+    echo '        location ~ \.php$ {' >> /etc/nginx/nginx.conf && \
+    echo '            fastcgi_pass 127.0.0.1:9000;' >> /etc/nginx/nginx.conf && \
+    echo '            fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;' >> /etc/nginx/nginx.conf && \
+    echo '            include fastcgi_params;' >> /etc/nginx/nginx.conf && \
+    echo '        }' >> /etc/nginx/nginx.conf && \
+    echo '        location ~ /\.(?!well-known) {' >> /etc/nginx/nginx.conf && \
+    echo '            deny all;' >> /etc/nginx/nginx.conf && \
+    echo '        }' >> /etc/nginx/nginx.conf && \
+    echo '    }' >> /etc/nginx/nginx.conf && \
+    echo '}' >> /etc/nginx/nginx.conf
 
-# Copy supervisor config
-COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+# Copy supervisor config (inline)
+RUN echo '[supervisord]' > /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'nodaemon=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo '[program:php-fpm]' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'command=php-fpm' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'autostart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'autorestart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo '[program:nginx]' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'command=nginx -g "daemon off;"' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'autostart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'autorestart=true' >> /etc/supervisor/conf.d/supervisord.conf
 
-# Copy entrypoint
+# Entrypoint
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh 2>/dev/null || true
 
-# Expose port
 EXPOSE 80
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost/health || exit 1
-
-# Start
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
