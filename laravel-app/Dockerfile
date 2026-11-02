@@ -4,28 +4,28 @@
 # ═══════════════════════════════════════
 
 # FROM php:8.3-fpm-alpine
-FROM php:8.5-fpm-alpine
+FROM php:8.5-fpm
 
 # ═══════════════════════════════════════
 # 1. تثبيت الحزم الأساسية
 # ═══════════════════════════════════════
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     netcat-openbsd \
     curl \
     nginx \
     supervisor \
-    curl \
     git \
     zip \
     unzip \
     libpng-dev \
     libzip-dev \
-    oniguruma-dev \
-    icu-dev \
-    mysql-client \
+    libonig-dev \
+    libicu-dev \
+    default-mysql-client \
     bash \
     nodejs \
-    npm
+    npm \
+    && rm -rf /var/lib/apt/lists/*
 
 # ═══════════════════════════════════════
 # 2. تثبيت إضافات PHP
