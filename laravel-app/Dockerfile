@@ -9,6 +9,8 @@ FROM php:8.3-fpm-alpine
 # 1. تثبيت الحزم الأساسية
 # ═══════════════════════════════════════
 RUN apk add --no-cache \
+    netcat-openbsd \
+    curl \
     nginx \
     supervisor \
     curl \
@@ -149,7 +151,7 @@ RUN echo '#!/bin/sh' > /usr/local/bin/entrypoint.sh && \
     echo 'set -e' >> /usr/local/bin/entrypoint.sh && \
     echo 'echo "🚀 Starting YHM..."' >> /usr/local/bin/entrypoint.sh && \
     echo 'echo "⏳ Waiting for database..."' >> /usr/local/bin/entrypoint.sh && \
-    echo 'until php artisan db:show > /dev/null 2>&1; do sleep 2; done' >> /usr/local/bin/entrypoint.sh && \
+    echo 'until nc -z db 3306; do sleep 2; done' >> /usr/local/bin/entrypoint.sh && \
     echo 'echo "✅ Database ready"' >> /usr/local/bin/entrypoint.sh && \
     echo 'if [ ! -f /var/www/html/storage/.migrated ]; then' >> /usr/local/bin/entrypoint.sh && \
     echo '    echo "📊 Running migrations..."' >> /usr/local/bin/entrypoint.sh && \
