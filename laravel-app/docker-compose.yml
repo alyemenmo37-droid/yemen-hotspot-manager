@@ -13,6 +13,7 @@ services:
     ports:
       - "8000:80"
     environment:
+      - APP_KEY=base64:ka0xLwG99+11n/QZRDH3S149Dju01AIfoUaZBKGKpbI=
       - APP_NAME=Yemen Hotspot Manager
       - APP_ENV=production
       - APP_DEBUG=false
@@ -25,10 +26,10 @@ services:
       - DB_DATABASE=yhm
       - DB_USERNAME=yhm_user
       - DB_PASSWORD=alyemenmo370123
-      - CACHE_STORE=redis
-      - SESSION_DRIVER=redis
+      - CACHE_STORE=file
+      - SESSION_DRIVER=file
       - REDIS_HOST=redis
-      - QUEUE_CONNECTION=redis
+      - QUEUE_CONNECTION=sync
       - MIKROTIK_MOCK=true
       - MIKROTIK_HOST=192.168.88.1
     volumes:
@@ -57,7 +58,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password_2026"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-palyemenmo370123"]
       interval: 10s
       timeout: 5s
       retries: 5

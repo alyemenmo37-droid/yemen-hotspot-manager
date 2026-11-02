@@ -36,7 +36,6 @@ RUN docker-php-ext-install \
     mbstring \
     zip \
     bcmath \
-    opcache \
     intl
 
 # ═══════════════════════════════════════
@@ -162,10 +161,6 @@ RUN echo '#!/bin/sh' > /usr/local/bin/entrypoint.sh && \
     echo '    php artisan db:seed --class=SettingSeeder --force || true' >> /usr/local/bin/entrypoint.sh && \
     echo '    touch /var/www/html/storage/.migrated' >> /usr/local/bin/entrypoint.sh && \
     echo '    echo "✅ Migrations complete"' >> /usr/local/bin/entrypoint.sh && \
-    echo 'fi' >> /usr/local/bin/entrypoint.sh && \
-    echo 'if [ -z "$APP_KEY" ]; then' >> /usr/local/bin/entrypoint.sh && \
-    echo '    echo "🔑 Generating app key..."' >> /usr/local/bin/entrypoint.sh && \
-    echo '    php artisan key:generate --force' >> /usr/local/bin/entrypoint.sh && \
     echo 'fi' >> /usr/local/bin/entrypoint.sh && \
     echo 'echo "⚡ Optimizing..."' >> /usr/local/bin/entrypoint.sh && \
     echo 'php artisan config:cache || true' >> /usr/local/bin/entrypoint.sh && \
