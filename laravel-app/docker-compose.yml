@@ -24,7 +24,7 @@ services:
       - DB_PORT=3306
       - DB_DATABASE=yhm
       - DB_USERNAME=yhm_user
-      - DB_PASSWORD=yhm_password_2026
+      - DB_PASSWORD=alyemenmo370123
       - CACHE_STORE=redis
       - SESSION_DRIVER=redis
       - REDIS_HOST=redis
@@ -52,8 +52,8 @@ services:
     environment:
       - MYSQL_DATABASE=yhm
       - MYSQL_USER=yhm_user
-      - MYSQL_PASSWORD=yhm_password_2026
-      - MYSQL_ROOT_PASSWORD=root_password_2026
+      - MYSQL_PASSWORD=alyemenmo370123
+      - MYSQL_ROOT_PASSWORD=alyemenmo370123
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
