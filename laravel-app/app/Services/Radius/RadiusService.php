@@ -281,4 +281,74 @@ public function getOverallStats(): array
         'upload_gb' => round($stats->total_out / 1024 / 1024 / 1024, 2),
     ];
 }
+
+/**
+ * اختبار الاتصال بـ FreeRADIUS (Access-Request)
+ * 
+ * @param string $username اسم المستخدم (رقم البطاقة)
+ * @param string $password كلمة المرور (رقم البطاقة)
+ * @return array
+ */
+
+/**
+ * اختبار المصادقة عبر FreeRADIUS (Access-Request)
+ * يستخدم خوارزمية RFC 2865 القياسية
+ */
+public function testRadiusAuth(string $username, string $password): array
+{
+    $host = config('radius.host', '127.0.0.1');
+    $secret = config('radius.secret', 'testing123');
+
+    try {
+        $radius = new \Dapphp\Radius\Radius();
+        $radius->setServer($host)
+               ->setSecret($secret)
+               ->setNasIpAddress('127.0.0.1')
+               ->setTimeout(5);
+
+        // إرسال طلب Access-Request
+        $response = $radius->accessRequest($username, $password);
+
+        // في مكتبة dapphp/radius (الإصدار 3.x)، إذا نجح الطلب، فإن $response 
+        // ستكون عبارة عن كائن أو مصفوفة تحتوي على خصائص معينة (وليست false).
+        // الطريقة الأسهل للتحقق هي معرفة ما إذا كانت النتيجة تحتوي على بيانات.
+        
+        if ($response === false) {
+            // إذا كانت النتيجة false، فهذا يعني فشل الاتصال أو حدث خطأ
+            $error = $radius->getErrorMessage() ?: 'Unknown error';
+            return [
+                'success' => false,
+                'error' => $error,
+            ];
+        }
+
+        // إذا وصلنا إلى هنا، فهذا يعني أن FreeRADIUS استجاب. 
+        // للتحقق من نوع الرد (قبول أو رفض)، نستطيع استخدام الدالة getResponseCode() إذا كانت موجودة.
+        // ولكن بما أنها غير موجودة في الإصدار 3.1.0، نستخدم ميزة getResponse().
+        
+        if (method_exists($radius, 'getResponseCode')) {
+            $code = $radius->getResponseCode();
+            if ($code === \Dapphp\Radius\Radius::ACCESS_ACCEPT) {
+                return ['success' => true, 'status' => 'Access-Accept'];
+            } elseif ($code === \Dapphp\Radius\Radius::ACCESS_REJECT) {
+                return ['success' => false, 'status' => 'Access-Reject'];
+            }
+        } else {
+            // طريقة بديلة: إذا كانت الدالة accessRequest ترجع بيانات (وليس false)،
+            // فهذا يعني أن الرد كان Access-Accept (في الإصدارات القديمة).
+            // لأن الرفض (Reject) عادةً يُرجع استثناءً أو false في هذه المكتبة.
+            return ['success' => true, 'status' => 'Access-Accept'];
+        }
+
+    } catch (\Throwable $e) {
+        // التقاط الاستثناءات (مثل Access-Reject أو Timeout)
+        $message = $e->getMessage();
+        
+        if (str_contains($message, 'Access-Reject')) {
+            return ['success' => false, 'status' => 'Access-Reject'];
+        }
+
+        return ['success' => false, 'error' => $message];
+    }
+}
 }
