@@ -51,5 +51,5 @@ CONTRIBUTING.md
 # Docker
 Dockerfile
 docker-compose.yml
-docker/
+# docker/
 .dockerignore

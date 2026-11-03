@@ -107,7 +107,7 @@ RUN echo 'worker_processes auto;' > /etc/nginx/nginx.conf && \
     echo '    keepalive_timeout 65;' >> /etc/nginx/nginx.conf && \
     echo '    client_max_body_size 20M;' >> /etc/nginx/nginx.conf && \
     echo '    server {' >> /etc/nginx/nginx.conf && \
-    echo '        listen 80;' >> /etc/nginx/nginx.conf && \
+    echo '        listen 0.0.0.0:80;' >> /etc/nginx/nginx.conf && \
     echo '        server_name _;' >> /etc/nginx/nginx.conf && \
     echo '        root /var/www/html/public;' >> /etc/nginx/nginx.conf && \
     echo '        index index.php;' >> /etc/nginx/nginx.conf && \
