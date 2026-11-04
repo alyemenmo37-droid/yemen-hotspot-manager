@@ -1,4 +1,4 @@
-# 📡 Yemen Hotspot Manager (YHM) v2.1
+# 📡 Yemen Hotspot Manager (YHM) v3.0
 <p align="center">
   <img src="https://img.shields.io/badge/version-2.0.0-blue?style=for-the-badge" alt="Version">
   <img src="https://img.shields.io/badge/Laravel-13-red?style=for-the-badge&logo=laravel" alt="Laravel">
