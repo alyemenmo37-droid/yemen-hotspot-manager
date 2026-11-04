@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SubscriptionWebController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CardController;
@@ -78,7 +79,9 @@ Route::get('/health', function () {
 // 3. Routes محمية (تحتاج تسجيل دخول)
 // ═══════════════════════════════════════
 Route::middleware('auth')->group(function () {
-
+    
+//Route::resource('subscriptions', \App\Http\Controllers\Api\SubscriptionWebController::class)->except(['show']);
+    Route::resource('subscriptions', SubscriptionWebController::class)->except(['show']);
     // Reports
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/', [\App\Http\Controllers\ReportController::class, 'index'])->name('index');
@@ -201,7 +204,8 @@ Route::prefix('admin/notifications')->name('admin.notifications.')->middleware('
         ->prefix('admin')
         ->name('admin.')
         ->group(function () {
-
+	    
+	    Route::resource('tenants', \App\Http\Controllers\Admin\TenantController::class);
             // Admin Dashboard
             Route::get('/', function () {
                 $stats = [
