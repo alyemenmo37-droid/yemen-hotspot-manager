@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Card;
+use App\Services\MikroTikService;
 use App\Services\Radius\RadiusService;
 
 class DashboardController extends Controller
 {
     /**
      * إحصائيات Dashboard
-     * 
+     *
      * GET /api/dashboard
      */
     public function index(RadiusService $radius)
@@ -28,19 +29,19 @@ class DashboardController extends Controller
                 ->limit(5)
                 ->get(),
         ];
-        
+
         return response()->json([
             'success' => true,
             'data' => $stats,
         ]);
     }
-    
+
     /**
      * معلومات MikroTik
-     * 
+     *
      * GET /api/dashboard/mikrotik
      */
-    public function mikrotik(\App\Services\MikroTikService $mikrotik)
+    public function mikrotik(MikroTikService $mikrotik)
     {
         return response()->json([
             'success' => true,

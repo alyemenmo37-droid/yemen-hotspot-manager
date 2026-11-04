@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CardController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\MikrotikApiController;
+use App\Http\Controllers\Api\SubscriptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -39,17 +40,17 @@ Route::post('/login', [AuthController::class, 'login'])
 // Protected Routes (تحتاج توكن)
 // ═══════════════════════════════════════
 Route::middleware('auth:sanctum')->group(function () {
-    
-    Route::get('/subscriptions', [\App\Http\Controllers\Api\SubscriptionController::class, 'index']);
-    Route::post('/subscriptions', [\App\Http\Controllers\Api\SubscriptionController::class, 'store']);
+
+    Route::get('/subscriptions', [SubscriptionController::class, 'index']);
+    Route::post('/subscriptions', [SubscriptionController::class, 'store']);
     // Auth
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
-    
+
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/dashboard/mikrotik', [DashboardController::class, 'mikrotik']);
-    
+
     // Cards
     Route::get('/cards/stats', [CardController::class, 'stats']);
     Route::get('/cards', [CardController::class, 'index']);
@@ -60,7 +61,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // ═══════════════════════════════════════
     // Subscriptions API
     // ═══════════════════════════════════════
-    Route::get('/subscriptions', [\App\Http\Controllers\Api\SubscriptionController::class, 'index']);
-    Route::post('/subscriptions', [\App\Http\Controllers\Api\SubscriptionController::class, 'store']);
+    Route::get('/subscriptions', [SubscriptionController::class, 'index']);
+    Route::post('/subscriptions', [SubscriptionController::class, 'store']);
 });
-

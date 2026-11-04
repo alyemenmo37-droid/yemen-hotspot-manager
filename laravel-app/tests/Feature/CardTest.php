@@ -49,7 +49,7 @@ class CardTest extends TestCase
         // 3. إنشاء مستخدم admin
         $admin = User::create([
             'name' => 'Test Admin',
-            'email' => 'test-admin-' . uniqid() . '@test.local',
+            'email' => 'test-admin-'.uniqid().'@test.local',
             'password' => bcrypt('password'),
             'role' => 'admin',
             'is_active' => true,

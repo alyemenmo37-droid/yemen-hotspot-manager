@@ -2,7 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Card;
+use App\Models\Category;
+use App\Models\SpeedLevel;
 use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class TenantSeeder extends Seeder
@@ -21,10 +25,10 @@ class TenantSeeder extends Seeder
         ]);
 
         // 2. ربط البيانات الحالية بالشبكة الأولى
-        \App\Models\User::whereNull('tenant_id')->update(['tenant_id' => $yemenNet->id]);
-        \App\Models\Card::whereNull('tenant_id')->update(['tenant_id' => $yemenNet->id]);
-        \App\Models\Category::whereNull('tenant_id')->update(['tenant_id' => $yemenNet->id]);
-        \App\Models\SpeedLevel::whereNull('tenant_id')->update(['tenant_id' => $yemenNet->id]);
+        User::whereNull('tenant_id')->update(['tenant_id' => $yemenNet->id]);
+        Card::whereNull('tenant_id')->update(['tenant_id' => $yemenNet->id]);
+        Category::whereNull('tenant_id')->update(['tenant_id' => $yemenNet->id]);
+        SpeedLevel::whereNull('tenant_id')->update(['tenant_id' => $yemenNet->id]);
 
         $this->command->info('✅ 2 tenants created + data linked');
     }

@@ -11,14 +11,14 @@ return [
     'auth_port' => (int) env('RADIUS_AUTH_PORT', 1812),
     'acct_port' => (int) env('RADIUS_ACCT_PORT', 1813),
     'coa_port' => (int) env('RADIUS_COA_PORT', 3799),
-    
+
     /*
     |--------------------------------------------------------------------------
     | RADIUS Database
     |--------------------------------------------------------------------------
     */
     'db_connection' => env('RADIUS_DB_CONNECTION', 'mysql'),
-    
+
     /*
     |--------------------------------------------------------------------------
     | Timeouts (بالثواني)

@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-	Schema::create('subscriptions', function (Blueprint $table) {
-	    $table->id();
-	    $table->foreignId('user_id')->constrained()->onDelete('cascade');
-	    $table->foreignId('speed_level_id')->constrained();
-	    $table->enum('status', ['active', 'expired', 'cancelled']);
-	    $table->date('starts_at');
-	    $table->date('ends_at');
-	    $table->timestamps();
-	});
+        Schema::create('subscriptions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('speed_level_id')->constrained();
+            $table->enum('status', ['active', 'expired', 'cancelled']);
+            $table->date('starts_at');
+            $table->date('ends_at');
+            $table->timestamps();
+        });
     }
 
     /**

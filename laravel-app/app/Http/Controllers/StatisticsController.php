@@ -40,7 +40,7 @@ class StatisticsController extends Controller
                 $join->on('cards.speed_level_id', '=', 'speed_levels.id')
                     ->where('cards.status', '!=', 'unused');
             })
-	    ->groupBy('categories.id', 'categories.name', 'categories.slug', 'categories.color', 'categories.description', 'categories.is_active', 'categories.created_at', 'categories.updated_at', 'categories.tenant_id')
+            ->groupBy('categories.id', 'categories.name', 'categories.slug', 'categories.color', 'categories.description', 'categories.is_active', 'categories.created_at', 'categories.updated_at', 'categories.tenant_id')
             ->get();
 
         // ═══════════════════════════════════════

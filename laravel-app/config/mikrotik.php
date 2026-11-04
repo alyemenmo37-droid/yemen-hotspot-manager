@@ -36,6 +36,6 @@ return [
     | CoA Settings
     |--------------------------------------------------------------------------
     */
-     'coa_secret' => env('MIKROTIK_COA_SECRET', 'coa_secret_2026'),
-     'coa_port' => env('MIKROTIK_COA_PORT', 3799),
+    'coa_secret' => env('MIKROTIK_COA_SECRET', 'coa_secret_2026'),
+    'coa_port' => env('MIKROTIK_COA_PORT', 3799),
 ];

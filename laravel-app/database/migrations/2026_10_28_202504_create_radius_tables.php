@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('value', 253)->default('');
             $table->index('username');
         });
-        
+
         // ═══════════════════════════════════════
         // 2. جدول الردود (radreply)
         // ═══════════════════════════════════════
@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('value', 253)->default('');
             $table->index('username');
         });
-        
+
         // ═══════════════════════════════════════
         // 3. جدول المجموعات (radgroupcheck)
         // ═══════════════════════════════════════
@@ -43,7 +43,7 @@ return new class extends Migration
             $table->string('value', 253)->default('');
             $table->index('groupname');
         });
-        
+
         Schema::create('radgroupreply', function (Blueprint $table) {
             $table->id();
             $table->string('groupname', 64)->default('');
@@ -52,7 +52,7 @@ return new class extends Migration
             $table->string('value', 253)->default('');
             $table->index('groupname');
         });
-        
+
         // ═══════════════════════════════════════
         // 4. جدول العضويات (radusergroup)
         // ═══════════════════════════════════════
@@ -63,7 +63,7 @@ return new class extends Migration
             $table->integer('priority')->default(1);
             $table->index('username');
         });
-        
+
         // ═══════════════════════════════════════
         // 5. جدول المحاسبة (radacct)
         // ═══════════════════════════════════════
@@ -95,7 +95,7 @@ return new class extends Migration
             $table->string('framedipv6prefix', 45)->nullable();
             $table->string('framedinterfaceid', 44)->nullable();
             $table->string('delegatedipv6prefix', 45)->nullable();
-            
+
             $table->index('username');
             $table->index('acctstarttime');
             $table->index('acctstoptime');

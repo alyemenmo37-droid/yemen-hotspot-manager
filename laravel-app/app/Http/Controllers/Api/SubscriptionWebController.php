@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Subscription;
 use App\Models\SpeedLevel;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
 
 class SubscriptionWebController extends Controller
@@ -13,12 +13,14 @@ class SubscriptionWebController extends Controller
         $subs = Subscription::where('user_id', auth()->id())
             ->with('speedLevel')
             ->get();
+
         return view('subscriptions.index', compact('subs'));
     }
 
     public function create()
     {
         $speedLevels = SpeedLevel::where('is_active', true)->get();
+
         return view('subscriptions.create', compact('speedLevels'));
     }
 

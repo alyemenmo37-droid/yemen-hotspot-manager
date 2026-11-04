@@ -11,6 +11,7 @@ class TenantController extends Controller
     public function index()
     {
         $tenants = Tenant::withCount('users', 'cards')->get();
+
         return view('admin.tenants.index', compact('tenants'));
     }
 
@@ -27,6 +28,7 @@ class TenantController extends Controller
         ]);
 
         Tenant::create($validated);
+
         return redirect()->route('admin.tenants.index')->with('success', 'تم إنشاء الشبكة');
     }
 
@@ -39,16 +41,18 @@ class TenantController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:100',
-            'domain' => 'nullable|string|max:100|unique:tenants,domain,' . $tenant->id,
+            'domain' => 'nullable|string|max:100|unique:tenants,domain,'.$tenant->id,
         ]);
 
         $tenant->update($validated);
+
         return redirect()->route('admin.tenants.index')->with('success', 'تم التحديث');
     }
 
     public function destroy(Tenant $tenant)
     {
         $tenant->delete();
+
         return back()->with('success', 'تم الحذف');
     }
 }

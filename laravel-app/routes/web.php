@@ -1,15 +1,19 @@
 <?php
 
-use App\Http\Controllers\SubscriptionWebController;
+use App\Http\Controllers\Admin\TenantController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\SubscriptionWebController;
 use App\Models\Card;
 use App\Models\Category;
 use App\Models\User;
 use App\Services\MikroTikService;
+use App\Services\Radius\RadiusService;
+use App\Services\TelegramService;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -58,16 +62,16 @@ Route::post('/logout', [LoginController::class, 'logout'])
 // Health Check (public, minimal)
 Route::get('/health', function () {
     try {
-        \DB::select('SELECT 1');
-        \Cache::put('health_ping', 'ok', 60);
-        
+        DB::select('SELECT 1');
+        Cache::put('health_ping', 'ok', 60);
+
         return response()->json([
             'status' => 'ok',
             'time' => now()->toDateTimeString(),
             'version' => '1.0.0',
             'app' => 'YHM',
         ]);
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         return response()->json([
             'status' => 'error',
             'message' => 'service unavailable',
@@ -79,33 +83,34 @@ Route::get('/health', function () {
 // 3. Routes محمية (تحتاج تسجيل دخول)
 // ═══════════════════════════════════════
 Route::middleware('auth')->group(function () {
-    
-//Route::resource('subscriptions', \App\Http\Controllers\Api\SubscriptionWebController::class)->except(['show']);
+
+    // Route::resource('subscriptions', \App\Http\Controllers\Api\SubscriptionWebController::class)->except(['show']);
     Route::resource('subscriptions', SubscriptionWebController::class)->except(['show']);
     // Reports
     Route::prefix('reports')->name('reports.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\ReportController::class, 'index'])->name('index');
-	Route::get('/subscriptions/pdf', [\App\Http\Controllers\ReportController::class, 'subscriptionsPdf'])->name('subscriptions.pdf');
-        Route::get('/cards/pdf', [\App\Http\Controllers\ReportController::class, 'cardsPdf'])->name('cards.pdf');
-        Route::get('/cards/csv', [\App\Http\Controllers\ReportController::class, 'cardsCsv'])->name('cards.csv');
-        Route::get('/sales/pdf', [\App\Http\Controllers\ReportController::class, 'salesPdf'])->name('sales.pdf');
-        Route::get('/usage/pdf', [\App\Http\Controllers\ReportController::class, 'usagePdf'])->name('usage.pdf');
-        Route::get('/usage/csv', [\App\Http\Controllers\ReportController::class, 'usageCsv'])->name('usage.csv');
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('/subscriptions/pdf', [ReportController::class, 'subscriptionsPdf'])->name('subscriptions.pdf');
+        Route::get('/cards/pdf', [ReportController::class, 'cardsPdf'])->name('cards.pdf');
+        Route::get('/cards/csv', [ReportController::class, 'cardsCsv'])->name('cards.csv');
+        Route::get('/sales/pdf', [ReportController::class, 'salesPdf'])->name('sales.pdf');
+        Route::get('/usage/pdf', [ReportController::class, 'usagePdf'])->name('usage.pdf');
+        Route::get('/usage/csv', [ReportController::class, 'usageCsv'])->name('usage.csv');
     });
 
     // Sync Accounting
-    Route::post('/radius/sync-accounting', function (\App\Services\Radius\RadiusService $radius) {
+    Route::post('/radius/sync-accounting', function (RadiusService $radius) {
         $stats = $radius->syncDataUsage();
-        return back()->with('success', 
+
+        return back()->with('success',
             "تم تحديث {$stats['updated']} بطاقة، تجاوز {$stats['exceeded']}"
         );
     })->name('radius.sync-accounting');
 
     // Accounting Reports
-    Route::get('/accounting', function (\App\Services\Radius\RadiusService $radius) {
+    Route::get('/accounting', function (RadiusService $radius) {
         $overall = $radius->getOverallStats();
         $topConsumers = $radius->getTopConsumers(20);
-        
+
         return view('accounting.index', compact('overall', 'topConsumers'));
     })->name('accounting.index');
 
@@ -131,9 +136,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('cards', CardController::class);
 
     // Bulk Actions
-    Route::post('/cards/bulk-action', [\App\Http\Controllers\CardController::class, 'bulkAction'])
+    Route::post('/cards/bulk-action', [CardController::class, 'bulkAction'])
         ->name('cards.bulk-action');
-        // تفعيل بطاقة
+    // تفعيل بطاقة
     Route::post('/cards/{card}/activate', [CardController::class, 'activate'])
         ->name('cards.activate');
 
@@ -185,18 +190,20 @@ Route::middleware('auth')->group(function () {
         })->name('sync');
     });
 
-// Test Notifications (Admin only)
-Route::prefix('admin/notifications')->name('admin.notifications.')->middleware('admin')->group(function () {
-    Route::post('/test', function (\App\Services\TelegramService $telegram) {
-        $result = $telegram->test();
-        return back()->with($result['success'] ? 'success' : 'error', $result['message']);
-    })->name('test');
-    
-    Route::post('/test-low-stock', function (\App\Services\TelegramService $telegram) {
-        $telegram->notifyLowStock(5, 10);
-        return back()->with('success', 'تم إرسال تنبيه المخزون');
-    })->name('low-stock');
-});
+    // Test Notifications (Admin only)
+    Route::prefix('admin/notifications')->name('admin.notifications.')->middleware('admin')->group(function () {
+        Route::post('/test', function (TelegramService $telegram) {
+            $result = $telegram->test();
+
+            return back()->with($result['success'] ? 'success' : 'error', $result['message']);
+        })->name('test');
+
+        Route::post('/test-low-stock', function (TelegramService $telegram) {
+            $telegram->notifyLowStock(5, 10);
+
+            return back()->with('success', 'تم إرسال تنبيه المخزون');
+        })->name('low-stock');
+    });
 
     // ═══════════════════════════════════════
     // Admin Routes (admin only)
@@ -205,8 +212,8 @@ Route::prefix('admin/notifications')->name('admin.notifications.')->middleware('
         ->prefix('admin')
         ->name('admin.')
         ->group(function () {
-	    
-	    Route::resource('tenants', \App\Http\Controllers\Admin\TenantController::class);
+
+            Route::resource('tenants', TenantController::class);
             // Admin Dashboard
             Route::get('/', function () {
                 $stats = [

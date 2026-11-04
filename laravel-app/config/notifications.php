@@ -12,7 +12,7 @@ return [
         'chat_id' => env('TELEGRAM_CHAT_ID'),
         'api_url' => 'https://api.telegram.org/bot',
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | Email
@@ -22,7 +22,7 @@ return [
         'enabled' => env('EMAIL_ENABLED', true),
         'admin_email' => env('MAIL_USERNAME'),
     ],
-    
+
     /*
     |--------------------------------------------------------------------------
     | Alerts

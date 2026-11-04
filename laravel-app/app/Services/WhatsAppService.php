@@ -10,7 +10,7 @@ class WhatsAppService
     {
         // محاكاة إرسال رسالة واتساب
         Log::channel('single')->info("📱 WhatsApp to {$to}: {$message}");
-        
+
         // في الإنتاج، استخدم UltraMsg أو Twilio هنا
         return true;
     }

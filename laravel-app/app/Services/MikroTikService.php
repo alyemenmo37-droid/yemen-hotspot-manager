@@ -6,16 +6,24 @@ use App\Models\MikrotikLog;
 use App\Services\Mikrotik\MockManager;
 use App\Services\Radius\RadiusService;
 use Illuminate\Support\Facades\Log;
+use RouterOS\Client;
 
 class MikroTikService
 {
     private bool $mockMode;
+
     private string $host;
+
     private int $port;
+
     private string $username;
+
     private string $password;
+
     private int $timeout;
+
     private MockManager $mock;
+
     private RadiusService $radius;
 
     public function __construct()
@@ -29,8 +37,8 @@ class MikroTikService
         $this->mockMode = config('mikrotik.mock');
 
         // تهيئة الخدمات
-        $this->mock = new MockManager();
-        $this->radius = new RadiusService();
+        $this->mock = new MockManager;
+        $this->radius = new RadiusService;
     }
 
     /**
@@ -70,7 +78,7 @@ class MikroTikService
             return [
                 'success' => false,
                 'mode' => 'real',
-                'message' => '❌ ' . $e->getMessage(),
+                'message' => '❌ '.$e->getMessage(),
             ];
         }
     }
@@ -82,12 +90,13 @@ class MikroTikService
     {
         // 1. إضافة إلى RADIUS أولاً (المصادقة المركزية)
         $radiusResult = $this->radius->addUser($cardNumber, $speed, 1440);
-        
-        if (!$radiusResult['success']) {
-            $this->log('add_user', $cardNumber, false, 'RADIUS: ' . $radiusResult['message']);
+
+        if (! $radiusResult['success']) {
+            $this->log('add_user', $cardNumber, false, 'RADIUS: '.$radiusResult['message']);
+
             return [
                 'success' => false,
-                'message' => 'فشل RADIUS: ' . $radiusResult['message'],
+                'message' => 'فشل RADIUS: '.$radiusResult['message'],
             ];
         }
 
@@ -133,6 +142,7 @@ class MikroTikService
         } catch (\Throwable $e) {
             $this->log('add_user', $cardNumber, false, $e->getMessage());
             Log::error('MikroTik addUser', ['error' => $e->getMessage()]);
+
             return [
                 'success' => false,
                 'message' => $e->getMessage(),
@@ -152,6 +162,7 @@ class MikroTikService
         if ($this->mockMode) {
             $result = $this->mock->removeUser($cardNumber);
             $this->log('remove_user', $cardNumber, true, 'Mock + RADIUS');
+
             return $result;
         }
 
@@ -163,6 +174,7 @@ class MikroTikService
 
             if (empty($users)) {
                 $client->disconnect();
+
                 return ['success' => false, 'message' => 'غير موجود'];
             }
 
@@ -170,10 +182,12 @@ class MikroTikService
             $client->disconnect();
 
             $this->log('remove_user', $cardNumber, true, 'Real + RADIUS');
+
             return ['success' => true];
 
         } catch (\Throwable $e) {
             $this->log('remove_user', $cardNumber, false, $e->getMessage());
+
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
@@ -191,6 +205,7 @@ class MikroTikService
                 $result['success'],
                 $result['message'] ?? 'تم الاتصال'
             );
+
             return $result;
         }
 
@@ -211,6 +226,7 @@ class MikroTikService
                 $result['success'],
                 $result['message'] ?? 'تم الفصل'
             );
+
             return $result;
         }
 
@@ -222,6 +238,7 @@ class MikroTikService
 
             if (empty($sessions)) {
                 $client->disconnect();
+
                 return ['success' => false, 'message' => 'غير متصل'];
             }
 
@@ -230,10 +247,12 @@ class MikroTikService
             $client->disconnect();
 
             $this->log('disconnect', $cardNumber, true, 'Real');
+
             return ['success' => true, 'message' => "تم فصل {$cardNumber}"];
 
         } catch (\Throwable $e) {
             $this->log('disconnect', $cardNumber, false, $e->getMessage());
+
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
@@ -245,6 +264,7 @@ class MikroTikService
     {
         if ($this->mockMode) {
             $this->mock->simulateTraffic();
+
             return array_values($this->mock->getSessions());
         }
 
@@ -253,6 +273,7 @@ class MikroTikService
             $client->connect();
             $sessions = $client->query('/ip/hotspot/active/print')->read();
             $client->disconnect();
+
             return $sessions;
         } catch (\Throwable $e) {
             return [];
@@ -272,6 +293,7 @@ class MikroTikService
 
         if ($this->mockMode) {
             $this->log('change_speed', $cardNumber, true, "Mock: $newSpeed");
+
             return ['success' => true, 'message' => "⚡ $newSpeed (محاكاة)"];
         }
 
@@ -283,6 +305,7 @@ class MikroTikService
 
             if (empty($users)) {
                 $client->disconnect();
+
                 return ['success' => false, 'message' => 'غير موجود'];
             }
 
@@ -294,10 +317,12 @@ class MikroTikService
             $client->disconnect();
 
             $this->log('change_speed', $cardNumber, true, $newSpeed);
+
             return ['success' => true, 'message' => "السرعة: $newSpeed"];
 
         } catch (\Throwable $e) {
             $this->log('change_speed', $cardNumber, false, $e->getMessage());
+
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
@@ -346,7 +371,7 @@ class MikroTikService
     // ═══════════════════════════════════════
     private function getClient()
     {
-        return new \RouterOS\Client([
+        return new Client([
             'host' => $this->host,
             'port' => $this->port,
             'user' => $this->username,
@@ -371,7 +396,7 @@ class MikroTikService
                 'created_at' => now(),
             ]);
         } catch (\Throwable $e) {
-            Log::error('Failed to log MikroTik action: ' . $e->getMessage());
+            Log::error('Failed to log MikroTik action: '.$e->getMessage());
         }
     }
 }
