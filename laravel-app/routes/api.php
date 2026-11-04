@@ -40,6 +40,8 @@ Route::post('/login', [AuthController::class, 'login'])
 // ═══════════════════════════════════════
 Route::middleware('auth:sanctum')->group(function () {
     
+    Route::get('/subscriptions', [\App\Http\Controllers\Api\SubscriptionController::class, 'index']);
+    Route::post('/subscriptions', [\App\Http\Controllers\Api\SubscriptionController::class, 'store']);
     // Auth
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
@@ -56,3 +58,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cards/{card}/activate', [CardController::class, 'activate']);
     Route::delete('/cards/{card}', [CardController::class, 'destroy']);
 });
+
