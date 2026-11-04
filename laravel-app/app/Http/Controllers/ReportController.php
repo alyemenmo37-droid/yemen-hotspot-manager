@@ -63,7 +63,7 @@ class ReportController extends Controller
                 $join->on('cards.speed_level_id', '=', 'speed_levels.id')
                      ->where('cards.status', '!=', 'unused');
             })
-            ->groupBy('categories.id')
+            ->groupBy('categories.id', 'categories.name', 'categories.slug', 'categories.color', 'categories.description', 'categories.is_active', 'categories.created_at', 'categories.updated_at', 'categories.tenant_id')
             ->get();
         
         // مبيعات يومية (آخر 30 يوم)
@@ -205,4 +205,18 @@ class ReportController extends Controller
             fclose($handle);
         }, $filename, $headers);
     }
+/**
+ * تقرير PDF: الاشتراكات
+ */
+public function subscriptionsPdf()
+{
+    $subscriptions = \App\Models\Subscription::with('user', 'speedLevel')->get();
+    
+    $pdf = Pdf::loadView('reports.subscriptions-pdf', compact('subscriptions'));
+    $pdf->setPaper('A4', 'portrait');
+    
+    $filename = 'subscriptions_' . now()->format('Y-m-d_H-i') . '.pdf';
+    
+    return $pdf->download($filename);
+}
 }

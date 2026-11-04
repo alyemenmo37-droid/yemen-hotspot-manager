@@ -6,6 +6,10 @@
         
         @auth
             <nav class="nav">
+		<a href="{{ route('subscriptions.index') }}" 
+		   class="{{ request()->routeIs('subscriptions.*') ? 'active' : '' }}">
+		    📅 اشتراكاتي
+		</a>
 		<a href="{{ route('reports.index') }}" 
 		   class="{{ request()->routeIs('reports.*') ? 'active' : '' }}">
 		    📄 التقارير

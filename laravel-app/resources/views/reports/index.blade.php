@@ -58,4 +58,16 @@
             </div>
         </div>
     </div>
+    {{-- تقرير الاشتراكات --}}
+    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+        <div style="font-size: 48px; margin-bottom: 15px;">📅</div>
+        <h3 style="color: #009639; margin-bottom: 10px;">تقرير الاشتراكات</h3>
+        <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+            قائمة بجميع الاشتراكات النشطة والمنتهية
+        </p>
+        <a href="{{ route('reports.subscriptions.pdf') }}" 
+           style="background: #c62828; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;">
+            📄 PDF
+        </a>
+    </div>
 @endsection

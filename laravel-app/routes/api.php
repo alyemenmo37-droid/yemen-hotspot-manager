@@ -33,7 +33,7 @@ Route::middleware('web')->group(function () {
 // Public Routes (بدون توكن)
 // ═══════════════════════════════════════
 Route::post('/login', [AuthController::class, 'login'])
-    ->middleware('throttle:5,1');  // 5 محاولات/دقيقة
+    ->middleware('throttle:60,1');  // 5 محاولات/دقيقة
 
 // ═══════════════════════════════════════
 // Protected Routes (تحتاج توكن)
@@ -57,5 +57,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cards', [CardController::class, 'store']);
     Route::post('/cards/{card}/activate', [CardController::class, 'activate']);
     Route::delete('/cards/{card}', [CardController::class, 'destroy']);
+    // ═══════════════════════════════════════
+    // Subscriptions API
+    // ═══════════════════════════════════════
+    Route::get('/subscriptions', [\App\Http\Controllers\Api\SubscriptionController::class, 'index']);
+    Route::post('/subscriptions', [\App\Http\Controllers\Api\SubscriptionController::class, 'store']);
 });
 

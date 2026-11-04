@@ -11,8 +11,9 @@ class CardController extends Controller
 {
 public function index(Request $request)
 {
-    $query = Card::with('speedLevel.category');
-    
+    $query = Card::with('speedLevel.category')
+        ->where('tenant_id', auth()->user()->tenant_id); // ← فلترة
+
     // ═══════════════════════════════════════
     // 1. البحث المتقدم
     // ═══════════════════════════════════════
@@ -98,6 +99,7 @@ public function store(Request $request, \App\Services\MikroTikService $mikrotik,
         'speed_level_id' => $speedLevel->id,
         'status' => Card::STATUS_UNUSED,
         'data_limit_mb' => $speedLevel->data_limit_mb,
+        'tenant_id' => auth()->user()->tenant_id, // ← جديد
     ]);
     
     // إشعار Telegram

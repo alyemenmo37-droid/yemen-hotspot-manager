@@ -8,6 +8,11 @@
         <span style="background: #c62828; color: white; padding: 5px 15px; border-radius: 20px; font-size: 13px; font-weight: bold;">
             مسؤول فقط
         </span>
+	<a href="{{ route('admin.tenants.index') }}" class="stat-card" style="background:#e3f2fd;padding:20px;border-radius:12px;text-decoration:none;color:#1565c0;">
+	    <div style="font-size:40px;">🏢</div>
+	    <div style="font-size:24px;font-weight:bold;">{{ \App\Models\Tenant::count() }}</div>
+	    <div>إدارة الشبكات</div>
+	</a>
     </div>
     
     {{-- Admin Stats --}}
