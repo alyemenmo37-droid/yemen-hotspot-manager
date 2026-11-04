@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>YHM Documentation</title>
+    <meta name="description" content="Yemen Hotspot Manager - نظام إدارة Hotspot احترافي">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; }
+        .sidebar { background: #f8f9fa; }
+        .sidebar-nav a { color: #009639; }
+        .sidebar-nav a.active { color: #007a2e; font-weight: bold; }
+        .markdown-section h1 { color: #009639; border-bottom: 2px solid #009639; }
+        .markdown-section h2 { color: #2e7d32; }
+        .markdown-section code { background: #f0f0f0; color: #c62828; }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        window.$docsify = {
+            name: 'Yemen Hotspot Manager',
+            repo: 'alyemenmo37-droid/yemen-hotspot-manager',
+            loadSidebar: true,
+            subMaxLevel: 3,
+            homepage: 'README.md',
+            coverpage: true,
+            auto2top: true,
+            search: {
+                placeholder: 'بحث...',
+                noData: 'لا توجد نتائج',
+                paths: 'auto',
+                depth: 3
+            },
+            copyCode: {
+                buttonText: 'نسخ'
+            },
+            pagination: {
+                previousText: 'السابق',
+                nextText: 'التالي',
+                crossChapter: true
+            }
+        };
+    </script>
+
+    <!-- Docsify -->
+    <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
+    <!-- Search Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+    <!-- Copy Code Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code"></script>
+    <!-- Pagination Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+</body>
+</html>
